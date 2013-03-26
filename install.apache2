@@ -1,0 +1,13 @@
+<VirtualHost {IPADDRESS}:{PORT}>
+	ServerName {URL}
+	DocumentRoot {TorStatus DIRECTORY}/web
+	<Directory {TorStatus DIRECTORY}/web/>
+		SetOutputFilter DEFLATE
+		AddOutputFilterByType DEFLATE text/html text/plain text/xml
+	</Directory>
+	ScriptAlias /cgi-bin/ {TorStatus ROOT}/cgi-bin/
+	<Directory {TorStatus ROOT}/cgi-bin/>
+		Options +ExecCGI
+		SetHandler cgi-script
+	</Directory>
+</VirtualHost>

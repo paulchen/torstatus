@@ -1,0 +1,54 @@
+Copyright (c) 2007 Kasimir Gabert
+See LICENSE for licensing information
+
+TorStatus - Tor Network Status
+
+You may download the most current version at:
+http://project.torstatus.kgprog.com/
+
+To setup TorStatus:
+
+a) Database
+	1) Create a MySQL database
+	2) Add the table structures from 'install.sql'
+	3) You may choose any database name you wish to use, however
+	   be sure to reflect the changes into the 'web/config.php' file.
+b) Web Server (example virtual host configuration file: install.apache2)
+	1) You need a web server set up (Apache recommended), which must
+	   support GD and PHP, and for the modern graphs must support
+	   Perl through CGI.
+	2) Set the folder 'web' as the document root for your virtual host
+	   or web server, and the folder 'cgi-bin' as your cgi folder.
+	3) Enable compression for the web directory in Apache
+c) Local Tor Server
+	1) Make sure you have a local Tor server running
+	   a) Your Tor server needs to be version 0.2.0.6-alpha or higher!
+	2) You need to add 'ControlPort PORTNUMBER' to your Tor config file.
+	3) You need to add 'DownloadExtraInfo 1' to your Tor config file for
+	   banwidth graphs to work correctly.
+	4) Set the cgi-bin directory of your webserver to TorStatus'
+	   cgi-bin directory. (For Perl-based graphs)
+d) Configure TorStatus
+	1) You may find the full list of configuration options in README.
+	2) You must copy 'web/config_template.php' to 'web/config.php'
+	3) You must set:
+		$LocalTorServerIP
+		$LocalTorServerControlPort
+		$SQL_Server
+		$SQL_User
+		$SQL_Pass
+		$SQL_Catalog (means SQL database)
+		$TNS_Path (leaving trailing slash)
+		$myMirrorName
+	4) Test your setup by running './tns_update.pl' or 
+	   'perl tns_update.pl'.  If no errors occur after several minutes,
+	   then things should be setup correctly.  Also browse to your website
+	   and make sure everything looks like it is working.
+e) Configure the daemon
+	1) Run 'tns_update.pl'.  (To run it in the background, run 
+	   './tns_update.pl &')
+
+TorStatus should now be set up!  You can test this by going to your TorStatus
+mirror website!
+
+Finally, edit http://project.torstatus.kgprog.com/ to declare your mirror!

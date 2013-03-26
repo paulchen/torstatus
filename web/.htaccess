@@ -1,0 +1,5 @@
+RewriteEngine On
+
+#RewriteCond %{HTTP_USER_AGENT}		^.*nagios.*$
+#RewriteRule .*				index-nagios.html
+

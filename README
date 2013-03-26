@@ -1,0 +1,230 @@
+Copyright (c) 2006-2007, Joseph B. Kowalski
+See LICENSE for licensing information
+
+WARNING: This file is slightly out of date.  For a more accurate install with
+versions 4.0 and onwards, please see the INSTALL file.
+
+PLEASE NOTE:  You must agree to the terms and conditions for GeoLite and for JPGraph to use this software to its fullest extent.  If you do not agree to the appropriate terms and licenses that are provided with this release, then you may not use those pieces of software.  Basically, this means that "as-is" this software cannot be used commercially.
+
+TorStatus - Tor Network Status
+
+You may download the most current version at:
+http://project.torstatus.kgprog.com/
+To setup the 'TorStatus' Web Application, follow these instructions:
+
+1) Create the MySQL database that the application will use. In the default 
+install directory, there is a MySQL script file that can be used to create 
+the initial database exactly as it needs to be. The default database name is 
+"TorNetworkStatus", but you can change this to be any name you want as long as
+it's reflected correctly in the config file. For development, MySQL 5 on Linux
+was used.
+
+2) Create a database user that has access to the database created in step 1 
+above. The user will need select, update, insert, and delete rights on the 
+database. 
+
+3) Place files in appropriate directory to be served by a PHP enabled web 
+server. IMPORTANT NOTE: You'll want the "web" subdirectory created when you 
+extracted this archive  to be web root for the site. Apache 2 on Linux with 
+PHP 5 were used for development. The PHP installation must support GD and 
+MySQL. You may need to re-compile PHP if you don't have support for these 
+options compiled in. See the PHP official website if you need help with this. 
+Setup "index.php" to be the default index page if desired.
+
+4) Download and install the JPGraph PHP graphing libraries. All you should 
+need to do is download the free version (Make sure you're in compliance with 
+the software's license, of course) and extract it to somewhere that your web 
+server can access. For simplicity, it is recommended that you place the files 
+in the "web/jpgraph" subdirectory that was created when you extracted this 
+archive. Of course, you can put them anywhere, but you'll have to edit the 
+config file to reflect the correct path. No other setup or customization of 
+JPGraph is necessary.
+
+5) Download and install the MaxMind GeoIP PHP API and the GeoLite Country 
+database. All you should need to do is download the "geoip.inc" file from the 
+PHP API section and the latest "GeoIP.dat" GeoLite country database file (Make
+sure you're in compliance with the software's license, of course) and place 
+the two files in a location that PHP can access. For simplicity, it is 
+recommended that you place the files in the "geoip" subdirectory that was 
+created when you extracted this archive. Of course, you can put them anywhere,
+but you'll have to edit the config file to reflect the correct paths. No other
+setup or customization of JPGraph is necessary.
+
+6) Make sure you have a local Tor server setup and running properly. This 
+application gets its data by connecting to the control port of a local Tor 
+server. If you have not already done so, you will need to enable the 
+"ControlPort" option in your Tor config file. Please see the Tor website if 
+you need help doing this. This application supports connecting to the control 
+port both in the default way (No authentication), and using 
+"HashedControlPassword" authentication. If you wish to use 
+"HashedControlPassword" authentication, make sure it's setup properly in your 
+Tor config file as well. Also, some of the functionality this application 
+makes use of when talking to the control port of the Tor server was only 
+recently implemented, in Tor 0.1.2.3-alpha. So, the local Tor server will 
+need to be that version or higher. Finally, the Tor server will need to be a 
+directory mirror. Only directory mirrors have descriptors for all routers on 
+hand, which this application requires.
+
+6) Copy "config_template.php" to "config.php".  Edit this file to be correct 
+for your environment and your preferences. Here is a run-down of the options:
+
+-- $LocalTorServerIP: The IP address that should be used to connect to the 
+local Tor server's control port. NOTE: This is not the server's public, or 
+advertised IP. Since Tor opens up it's control port on the 127.0.0.1 interface
+by default, you probably will never need to change this.
+
+-- $LocalTorServerControlPort: The control port you have your Tor server setup
+to listen on. Check the Tor config file if you don't know.
+
+-- $LocalTorServerPassword: If you have setup the "HashedControlPassword" 
+option in your Tor config file, you will need to enter the password 
+(clear-text) here. If not, leave this option set to null and the default 
+(No authentication) will be used.
+
+-- $SQL_Server: IP address or hostname of your MySQL server.
+
+-- $SQL_User: Username you setup for the database.
+
+-- $SQL_Pass: Password you setup for the database.
+
+-- $SQL_Catalog: Name of the database. Default is "TorNetworkStatus", but this
+may be anything you want. 
+
+-- $UsingSquid: Set this if you are currently running a Squid web accelerating
+server.  You will need to set the other appropriate settings in config.php
+under the Squid category for this to work fully.
+
+-- $JPGraph_Path: Set this to the path where you extracted the JPGraph 
+libraries. Note that this is a web path. It can be absolute or relative. If 
+using it in a relative way, this path is relative to the "web" subdirectory. 
+Make sure you leave the trailing slash.
+
+-- $GEOIP_Path: Set this to the path where you placed the MaxMind GeoIP PHP 
+API file (geoip.inc). Note that this path can be absolute or relative. If it 
+is used in a relative way, it is relative to the root of this application, one
+level up from the "web" subdirectory. Make sure you leave the trailing slash.
+
+-- $GEOIP_Database_Path: Set this to the path where you placed the MaxMind 
+GeoLite Country database file (GeoIP.dat). Note that this path can be absolute
+or relative. If it is used in a relative way, it is relative to the root of 
+this application, one level up from the "web" subdirectory. Make sure you 
+leave the trailing slash.
+
+-- $PHP_Path: Set this to the path where the PHP executable resides on your 
+system. Make sure you leave the trailing slash. This path should be absolute 
+(From system root).
+
+-- $TNS_Path: Set this to the path where you have extracted the 
+TorNetworkStatus archive. This is the root of this application, one level up 
+from the "web" subdirectory. Make sure you leave the trailing slash. This path
+should be absolute (From system root).
+         
+-- $Cache_Expire_Time: Set this to the amount of time, in seconds, that the 
+local-cache (MySQL Database) is considered valid. This will allow the 
+"tns_agent.php" script, described later, know how often to refresh the 
+database with new information from the local Tor server. 
+
+-- $ColumnHeaderInterval: This variable specifies how often a column header 
+row is inserted into the result set. So, if set to '30', a column header row 
+will be inserted after every 30 results printed to the screen.
+
+-- $ColumnList_ACTIVE_DEFAULT: This array specifies the default columns that
+are active and displayed before a user has done any customization of column
+display settings. Note that the order matters here, too. If you remove a
+column from this list, you should add it to the "$ColumnList_INACTIVE_DEFAULT"
+list, documented below. Likewise, if you add a column to this list, you should
+remove it from the "$ColumnList_INACTIVE_DEFAULT" list.
+
+-- $ColumnList_INACTIVE_DEFAULT: This array is the inverse of the
+"$ColumnList_ACTIVE_DEFAULT" array, defined above. Columns listed in this
+array will not be displayed by default.
+
+Valid options for the "$ColumnList_ACTIVE_DEFAULT" and 
+"$ColumnList_INACTIVE_DEFAULT" arrays are:
+
+'Bandwidth'
+'Contact'
+'CountryCode'
+'DirPort'
+'Fingerprint'
+'Hostname'
+'IP'
+'LastDescriptorPublished'
+'Platform'
+'ORPort'
+'Uptime'
+
+'Authority'
+'BadDir'
+'BadExit'
+'Exit'
+'Fast'
+'Guard'
+'Hibernating'
+'Named'
+'Stable'
+'Running'
+'Valid'
+'V2Dir'
+
+-- $LocalTimeZone: This is simply a string where you can specify your time 
+zone, so that the "Cache Last Updated" field at the bottom of the page makes 
+sense to users in other time zones, since that field is in local time. 
+Whatever you enter here is appended to the end of the "Cache Last Updated" 
+field.
+
+-- $OffsetFromGMT: This is a positive or negative number, in seconds, 
+representing how far off the web server is from GMT. So, if you are in the 
+Pacific Standard Time (PST) zone which is GMT -8:00, for example, you would 
+enter -28800 (8 hours in seconds) in this field. This variable is used for 
+various time calculations during the execution of the application.
+
+-- $DNSEL_Domain: If you are running the DNSEL server component (See
+"README_DNSEL" for details) and wish to advertise it on the web site, set
+this variable to the full domain name for which the DNSEL server is
+authoritative for. This value should match what you set in the
+"DNSELServer.properties" file for "config_DNSEL_Domain". If you leave this set
+to 'null', no DNSEL server link will be displayed on the site.
+
+-- $Hidden_Service_URL: If you are also making the TorNetworkStatus site
+available as a Tor Hidden Service and wish to advertise this on the site,
+enter the URL of the Hidden Service here. If you leave this set to 'null', no
+Hidden Service link will be displayed on the site.
+
+-- $TorNetworkStatus_Version: A version string which displays at the bottom 
+of each page.
+
+7) Setup a way for scheduled local-cache (database) refreshes to take place. 
+You have two options here. Number one is to simply run the "tns_agent.php" 
+file using stand-alone PHP, and allow it to continue running in the 
+background. On Unix type systems, you'll probably want to start this as a 
+background task. The file will run the update process at whatever interval 
+you've specified in the config file. Number two is to either manually run the
+"tns_update.php" file using stand-alone PHP periodically (not recommended), or
+use some other task scheduling mechanism to run it, such as cron. If you do 
+things this way, the refresh interval you've specified in the config file 
+will have no bearing. It will be up to you to setup your task scheduling 
+mechanism at the interval you want.
+
+8) Set up the cgi-bin directory to be an actual cgi-bin directory with your
+webserver.  TorStatus will point to /cgi-bin/perlgraph/plot.pl to create Perl
+based graphs.
+
+9) You're done! Load the site in a browser, and if all is well, it should 
+work. 
+
+10) Optionally, it may make you feel better to delete the "sql" subdirectory. 
+Everything else is required.
+
+
+Best regards,
+Joe Kowalski
+
+
+NOTE: This application was developed using Linux, Apache 2, MySQL 5, and PHP 
+5. The application may work fine in other environments, but I have not tested
+this. 
+
+
+NOTE: This product includes GeoLite data created by MaxMind, available from 
+http://www.maxmind.com/.

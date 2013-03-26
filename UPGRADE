@@ -1,0 +1,15 @@
+It is strongly recommend to upgrade to version 4.0 through a clean install.
+The database structure has not changed much, so if you want to keep TorStatus
+running during the install period, then you can just add the Bandwidth and
+Mirrors table to the database.
+
+----
+
+To upgrade to TorStatus v3.6 or higher from any previous versions, you need 
+to make sure that you are using Tor 0.2.0.6-alpha or later.  This is due to
+proposal 104 to Tor, which uses smaller descriptors by default.
+
+You may view more in ticket 40 at http://project.torstatus.kgprog.com/
+
+You also need to set the option "DownloadExtraInfo 1" in your Tor
+configuration.
