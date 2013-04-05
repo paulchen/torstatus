@@ -138,6 +138,10 @@ function GenerateHeaderRow()
 			case "V2Dir":
 			$HeaderRowString .= ",Flag - V2Dir";
 			break;
+
+			case "HSDir":
+			$HeaderRowString .= ",Flag - HSDir";
+			break;
 		}
 	}
 
@@ -527,6 +531,11 @@ if (in_array("Valid", $ColumnList_ACTIVE))
 if (in_array("V2Dir", $ColumnList_ACTIVE))
 {
 	$query .= ", $ActiveNetworkStatusTable.FV2Dir as V2Dir";
+}
+
+if (in_array("HSDir", $ColumnList_ACTIVE))
+{
+	$query .= ", $ActiveNetworkStatusTable.FHSDir as HSDir";
 }
 
 $query .= ", INET_ATON($ActiveNetworkStatusTable.IP) as NIP from $ActiveNetworkStatusTable inner join $ActiveDescriptorTable on $ActiveNetworkStatusTable.Fingerprint = $ActiveDescriptorTable.Fingerprint";
@@ -960,6 +969,7 @@ else
 	$query = $query . " order by " . $SR . " " . $SO . ", Name Asc";
 }
 
+// die($query);
 $result = mysql_query($query) or die('Query failed: ' . mysql_error());
 
 // Generate header row
