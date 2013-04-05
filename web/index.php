@@ -129,6 +129,7 @@ $country_codes = array (
 "az" => "Azerbaijan",
 "ba" => "Bosnia And Herzegowina",
 "bb" => "Barbados",
+"bd" => "Bangladesh",
 "be" => "Belgium",
 "bf" => "Burkina Faso",
 "bg" => "Bulgaria",
