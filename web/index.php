@@ -288,6 +288,7 @@ $country_codes = array (
 "pm" => "St. Pierre And Miquelon",
 "pn" => "Pitcairn",
 "pr" => "Puerto Rico",
+"ps" => "State of Palestine",
 "pt" => "Portugal",
 "pw" => "Palau",
 "py" => "Paraguay",
@@ -588,7 +589,7 @@ function GenerateHeaderRow()
 
 function DisplayRouterRow()
 {
-	global $CurrentResultSet, $record, $ColumnList_ACTIVE, $country_codes;
+	global $CurrentResultSet, $record, $ColumnList_ACTIVE, $country_codes, $notified_missing_countries, $notified_missing_flags;
 	if (isset($record['BadExit']) && $record['BadExit'])
 	{
 		echo "<tr class='B'>";
@@ -618,6 +619,37 @@ function DisplayRouterRow()
 		echo "<td class='TRr'>";
 	}
 	$countrycode = strtolower($record['CountryCode']);
+	if ($countrycode != '' && !isset($country_codes[$countrycode]))
+	{
+		if(!isset($notified_missing_countries))
+		{
+			$notified_missing_countries = array();
+		}
+
+		if(!in_array($countrycode, $notified_missing_countries))
+		{
+			$parameter = mysql_real_escape_string($countrycode);
+			mysql_query("INSERT INTO missing_countries (country_code) VALUES ('$parameter') ON DUPLICATE KEY UPDATE country_code = country_code" );
+
+			$notified_missing_countries[] = $countrycode;
+		}
+	}
+	if ($countrycode != '' && !file_exists("img/flags/$countrycode.gif"))
+	{
+		if(!isset($notified_missing_flags))
+		{
+			$notified_missing_flags = array();
+		}
+
+		if(!in_array($countrycode, $notified_missing_flags))
+		{
+			$parameter = mysql_real_escape_string($countrycode);
+			mysql_query("INSERT INTO missing_flags (country_code) VALUES ('$parameter') ON DUPLICATE KEY UPDATE country_code = country_code" );
+
+			$notified_missing_flags[] = $countrycode;
+		}
+	}
+
 	if ($countrycode == "") { $countrycode = "nna"; $record['CountryCode'] = "NNA"; }
 	echo "<img src='img/flags/".$countrycode.".gif' class='flag' width='18px' alt='".$record['CountryCode']."' title='".$country_codes[strtolower($record['CountryCode'])]."'/>&nbsp;<a href='router_detail.php?FP=" . $record['Fingerprint'] . "'>" . $record['Name'] . "</a></td>";
 	foreach($ColumnList_ACTIVE as $value)
