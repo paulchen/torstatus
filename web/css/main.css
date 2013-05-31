@@ -442,6 +442,7 @@ td.iT
 table.bwb
 {
 	border: 0;
+	width: 125px;
 }
 td.bwr
 {
@@ -471,6 +472,16 @@ td.bwr4
 td.bwr5
 {
 	background-color: black;
+	width: 85px;
+}
+td.bwr6
+{
+	background-color: #ffd700;
+	width: 85px;
+}
+td.bwr7
+{
+	background-color: #009aff;
 	width: 85px;
 }
 table.displayTable
