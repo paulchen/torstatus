@@ -816,7 +816,7 @@ function DisplayRouterRow()
 			}
 			else if ($record[$value] > 6000 && $record[$value] <= 10000)
 			{
-				$bandwidth = ($bandwidth-6000)/4;
+				$bandwidth = floor(($bandwidth-6000)/4);
 				$background = "bwr6";
 				$foreground = "7";
 			}
