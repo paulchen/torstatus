@@ -661,7 +661,10 @@ function DisplayRouterRow()
 	}
 
 	if ($countrycode == "") { $countrycode = "nna"; $record['CountryCode'] = "NNA"; }
-	echo "<img src='img/flags/".$countrycode.".gif' class='flag' width='18px' alt='".$record['CountryCode']."' title='".$country_codes[strtolower($record['CountryCode'])]."'/>&nbsp;<a href='router_detail.php?FP=" . $record['Fingerprint'] . "'>" . $record['Name'] . "</a></td>";
+	echo "<div class='flag_$countrycode'></div>&nbsp;";
+#	echo "<img src='img/flags/".$countrycode.".gif' class='flag' width='18px' alt='".$record['CountryCode']."' title='".$country_codes[strtolower($record['CountryCode'])]."'/>&nbsp;";
+	echo "<a href='router_detail.php?FP=" . $record['Fingerprint'] . "'>" . $record['Name'] . "</a></td>";
+
 	foreach($ColumnList_ACTIVE as $value)
 	{
 		switch (TRUE) 
@@ -2198,6 +2201,7 @@ $mirrorList = $mirrorListRow[0];
 	<title>TorStatus - Tor Network Status</title>
 	<link rel="stylesheet" type="text/css" href="css/main.css" />
 	<link rel="stylesheet" type="text/css" href="css/style.css" />
+	<link rel="stylesheet" type="text/css" href="css/flags.css" />
 	<!--[if lt IE 7.]>
 	<script defer type="text/javascript" src="/js/pngfix.js"></script>
 	<![endif]-->
