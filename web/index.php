@@ -661,7 +661,7 @@ function DisplayRouterRow()
 	}
 
 	if ($countrycode == "") { $countrycode = "nna"; $record['CountryCode'] = "NNA"; }
-	echo "<div class='flag_$countrycode'></div>&nbsp;";
+	echo "<div class='flag_$countrycode' title='".$country_codes[strtolower($record['CountryCode'])]."'></div>&nbsp;";
 #	echo "<img src='img/flags/".$countrycode.".gif' class='flag' width='18px' alt='".$record['CountryCode']."' title='".$country_codes[strtolower($record['CountryCode'])]."'/>&nbsp;";
 	echo "<a href='router_detail.php?FP=" . $record['Fingerprint'] . "'>" . $record['Name'] . "</a></td>";
 
