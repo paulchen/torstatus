@@ -556,3 +556,174 @@ img.sorting
 	border-style: none;
 	margin-left: 2px;
 }
+
+/* Body */
+body
+{
+	margin: 0;
+	padding: 0;
+	background: #a4a5a9;
+}
+
+/* Top bar */
+div.topbar
+{
+	background: url(/img/topbargradient.png) top left repeat-x #000072;
+	width: 100%;
+	top: 0px;
+	left: 0px;
+	text-align: left;
+}
+img.topbarlogo
+{
+	margin-left: 10px;
+	margin-right: auto;
+	border: 0;
+	vertical-align: bottom;
+}
+a.logoimage
+{
+	text-decoration: none;
+}
+span.logotext
+{
+	color: white;
+	font-size: .8em;
+	text-align: right;
+	width: 100%;
+}
+a.logotext:link,a.logotext:active,a.logotext:visited
+{
+	color: white;
+	text-decoration: none;
+}
+a.logotext:hover
+{
+	text-decoration: underline;
+}
+div.separator
+{
+	background-color: #59990e;
+	height: 1px;
+}
+div.mirrorbar,div.infobar
+{
+	color: white;
+	font-size: 0.8em;
+	background-color: #000072;
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+div.closedinfobar
+{
+	color: white;
+	background-color: #000072;
+	padding: 0px;
+	text-align: center;
+	padding-top: 4px;
+}
+
+div.infobar
+{
+	text-align: center;
+}
+
+img.infobarbutton
+{
+	border-style: none;
+	vertical-align: middle;
+}
+
+span.collapseinfobar
+{
+	float: right;
+	position: absolute;
+}
+
+/* Content */
+
+div.content
+{
+	background: url(/img/graygradient.png) top left repeat-x #a4a5a9;
+	padding: 0;
+	margin: 0;
+}
+
+.dropcontainer
+{
+	width: 400px;
+	margin-left: auto;
+	margin-right: auto;
+}
+.dropshadow2{
+	background: url(/img/middleboxshadow.png) no-repeat bottom right !important;
+	background: url(/img/shadow.gif) no-repeat bottom right;
+	margin: 10px 0 10px 10px !important;
+	margin: 10px 0 10px 5px;
+	width: 400px;
+	padding: 0px;
+}
+.innerbox{
+	position:relative;
+	bottom:6px;
+	right: 6px;
+	/*border: 1px solid #999999;*/
+	margin: 0px 0px 0px 0px;
+}
+
+/* Torcheck section */
+table.torcheck
+{
+	border-style: solid;
+	border-color: #000072; /*#959595;*/
+	border-width: 1px;
+	margin: 0px;
+	padding: 0px;
+	background: white;
+	width: 400px;
+	height: 65px;
+}
+td.tab
+{
+	height: 100%;
+	background: url(/img/middleboxgreengradient.png) top left repeat-x #59990e;
+	text-align: center;
+	vertical-align: middle;
+	width: 65px;
+	border-right-style: solid;
+	border-right-color: #000072;
+	border-right-width: 1px;
+}
+a.tab:hover
+{
+	text-decoration: underline;
+}
+td.content
+{
+	padding: 10px;
+}
+
+/* Search box */
+input.searchbox
+{
+	width: 13em;
+	height: 1.5em;
+	border: 2px #59990e solid;
+	margin: 0;
+	padding: .38em .5em 0 .5em;
+}
+a.searchbox img.searchbox
+{
+	border: 2px #59990e solid;
+	height: 25px;
+	width: 21px;
+	margin: 0;
+	margin-bottom: -9px;
+	background: top left no-repeat;
+	background-image: url(/img/search.png);
+}
+a.searchbox:hover img.searchbox
+{
+	background-image: url(/img/searchhover.png);
+}

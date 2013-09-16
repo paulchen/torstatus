@@ -40,7 +40,6 @@ $mirrorList = $mirrorListRow[0];
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 	<title>TorStatus - <?php echo $pageTitle; ?></title>
 	<link rel="stylesheet" type="text/css" href="css/main.css" />
-	<link rel="stylesheet" type="text/css" href="css/style.css" />
 	<!--[if lt IE 7.]>
 	<script defer type="text/javascript" src="/js/pngfix.js"></script>
 	<![endif]-->

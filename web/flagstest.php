@@ -6,7 +6,6 @@
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 	<title>TorStatus - Tor Network Status</title>
 	<link rel="stylesheet" type="text/css" href="css/main.css" />
-	<link rel="stylesheet" type="text/css" href="css/style.css" />
 	<link rel="stylesheet" type="text/css" href="css/flags.css" />
 	<!--[if lt IE 7.]>
 	<script defer type="text/javascript" src="/js/pngfix.js"></script>
