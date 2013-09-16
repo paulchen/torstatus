@@ -838,7 +838,8 @@ function DisplayRouterRow()
 			$bandwidth = floor(($bandwidth % 1000)/$bandwidthtop);
 			if ($bandwidth > 85) { $bandwidth = 85; }
 			if ($bandwidth == 0) { $bandwidth = 1; }
-			echo "<td class='TDb'><table cellspacing='0' cellpadding='0' class='bwb'><tr title='".$record[$value]." KBs'><td class='$background'><img src='img/bar/${foreground}.png' width='${bandwidth}px' height='16px' alt='".$record[$value]."' /></td><td>&nbsp;<small>&nbsp;".$record[$value]."</small></td></tr></table></td>";
+			#echo "<td class='TDb'><table cellspacing='0' cellpadding='0' class='bwb'><tr title='".$record[$value]." KBs'><td class='$background'><img src='img/bar/${foreground}.png' width='${bandwidth}px' height='16px' alt='".$record[$value]."' /></td><td>&nbsp;<small>&nbsp;".$record[$value]."</small></td></tr></table></td>";
+			echo "<td class='TDb'><table cellspacing='0' cellpadding='0' class='bwb'><tr title='".$record[$value]." KBs'><td class='$background'><div class='fg${foreground}' style='width: ${bandwidth}px; height: 16px;' /></td><td>&nbsp;<small>&nbsp;".$record[$value]."</small></td></tr></table></td>";
 			break;
 
   			case

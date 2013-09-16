@@ -484,6 +484,38 @@ td.bwr7
 	background-color: #009aff;
 	width: 85px;
 }
+div.fg1
+{
+	background-color: #a3a3a3;
+}
+div.fg2
+{
+	background-color: #757575;
+}
+div.fg3
+{
+	background-color: #424242;
+}
+div.fg4
+{
+	background-color: #242424;
+}
+div.fg5
+{
+	background-color: #010101;
+}
+div.fg6
+{
+	background-color: #ffd700;
+}
+div.fg7
+{
+	background-color: #009aff;
+}
+div.fg8
+{
+	background-color: #f13e05;
+}
 table.displayTable
 {
 	border-style: solid;
