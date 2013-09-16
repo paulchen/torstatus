@@ -1,0 +1,3 @@
+ExpiresDefault "access plus 1 year"
+ExpiresActive On
+
