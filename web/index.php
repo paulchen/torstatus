@@ -2291,7 +2291,9 @@ Good job, you do not have JavaScript enabled!
 
 if(!(false === strpos($Hidden_Service_URL, $Host)))
 {
-	echo "<font class='usingTor'>-You appear to be accessing this server through the Tor network as a hidden service-</span><br/><br/>";
+	echo '<tr><td class="tab"><img src="/img/usingtor.png" alt="You are using Tor" /></td><td class="content">';
+	echo '<span class="usingTor">You appear to be accessing this server through the Tor network as a hidden service.</span>';
+	echo '</td></tr>';
 }
 else if ($PositiveMatch_IP == 1)
 {
@@ -2320,6 +2322,7 @@ else
 	echo "</td></tr>";
 }
 
+/*
 if($Hidden_Service_URL != null)
 {
 	echo "<tr>\n";
@@ -2328,6 +2331,7 @@ if($Hidden_Service_URL != null)
 	echo "</b></td>\n";
 	echo "</tr>\n";
 }
+ */
 ?>
 
 </table>
