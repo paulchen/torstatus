@@ -661,7 +661,7 @@ function DisplayRouterRow()
 	}
 
 	if ($countrycode == "") { $countrycode = "nna"; $record['CountryCode'] = "NNA"; }
-	echo "<div class='flag_$countrycode' title='".$country_codes[strtolower($record['CountryCode'])]."'></div>&nbsp;";
+	echo "<div class='flags_$countrycode' title='".$country_codes[strtolower($record['CountryCode'])]."'></div>&nbsp;";
 #	echo "<img src='img/flags/".$countrycode.".gif' class='flag' width='18px' alt='".$record['CountryCode']."' title='".$country_codes[strtolower($record['CountryCode'])]."'/>&nbsp;";
 	echo "<a href='router_detail.php?FP=" . $record['Fingerprint'] . "'>" . $record['Name'] . "</a></td>";
 
@@ -692,35 +692,35 @@ function DisplayRouterRow()
 			}
 			if ($record['Fast'] == 1)
 			{
-				echo "</td><td><img src='img/status/Fast.png' title='Fast Server' alt='Fast Server' />";
+				echo "</td><td><div class='status_Fast' title='Fast Server'></div>";
 			}
 			if ($record['Valid'] == 0)
 			{
-				echo "</td><td><img src='img/status/Disputed.png' title='Not Listed By All Directory Servers' alt='Disputed Server' />";
+				echo "</td><td><div class='status_Disputed' title='Not Listed By All Directory Servers'></div>";
 			}
 			if ($record['Exit'] == 1)
 			{
-				echo "</td><td><img src='img/status/Exit.png' title='Exit Server' alt='Exit Server' />";
+				echo "</td><td><div class='status_Exit' title='Exit Server'></div>";
 			}
 			if ($record['V2Dir'] == 1)
 			{
-				echo "</td><td><img src='img/status/Dir.png' title='Directory Server' alt='Directory Server' />";
+				echo "</td><td><div class='status_Dir' title='Directory Server'></div>";
 			}
 			if ($record['HSDir'] == 1)
 			{
-				echo "</td><td><img src='img/status/HSDir.png' title='HS Directory Server' alt='HS Directory Server' />";
+				echo "</td><td><div class='status_HSDir' title='HS Directory Server'></div>";
 			}
 			if ($record['Guard'] == 1)
 			{
-				echo "</td><td><img src='img/status/Guard.png' title='Guard Server' alt='Guard Server' />";
+				echo "</td><td><div class='status_Guard' title='Guard Server'></div>";
 			}
 			if ($record['Stable'] == 1)
 			{
-				echo "</td><td><img src='img/status/Stable.png' title='Stable Server' alt='Stable Server'/>";
+				echo "</td><td><div class='status_Stable' title='Stable Server'></div>";
 			}
 			if ($record['Authority'] == 1)
 			{
-				echo "</td><td><img src='img/status/Authority.png' title='Authority Server' alt='Authority Server'/>";
+				echo "</td><td><div class='status_Authority' title='Authority Server'></div>";
 			}
 			if (isset($record['Platform']))
 			{
@@ -774,7 +774,7 @@ function DisplayRouterRow()
 				{
 					$image = "OpenBSD";
 				}
-				echo "</td><td><img src='img/os-icons/$image.png' title='".htmlentities($record['Platform'],ENT_QUOTES)."' alt='".htmlentities($record['Platform'],ENT_QUOTES)."' />";
+				echo "</td><td><div class='os_$image' title='".htmlentities($record['Platform'],ENT_QUOTES)."'></div>";
 			}
 			if ($innerTable)
 			{
@@ -2201,7 +2201,7 @@ $mirrorList = $mirrorListRow[0];
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 	<title>TorStatus - Tor Network Status</title>
 	<link rel="stylesheet" type="text/css" href="css/main.css" />
-	<link rel="stylesheet" type="text/css" href="css/flags.css" />
+	<link rel="stylesheet" type="text/css" href="css/sprites.css" />
 	<!--[if lt IE 7.]>
 	<script defer type="text/javascript" src="/js/pngfix.js"></script>
 	<![endif]-->
