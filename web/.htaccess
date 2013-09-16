@@ -7,3 +7,7 @@ Options -Indexes
 
 SetOutputFilter DEFLATE
 
+ExpiresActive On
+ExpiresByType image/vnd.microsoft.icon "access plus 1 year"
+FileETag none
+
