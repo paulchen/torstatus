@@ -864,7 +864,7 @@ function DisplayRouterRow()
   			case
 			($value == "Uptime"):
 			
-			if ($record[$value] > -1 && $record[$value] < 5)
+			if ($record[$value] > -1 && $record[$value] < 5*24)
 			{
 				echo "<td class='TDc'>";
 				if ($record['Running'] == 0 && $record['Hibernating'] == 0)
@@ -875,9 +875,11 @@ function DisplayRouterRow()
 				{
 					echo "<img src='/img/blank.gif' alt=' ' width='12px' />";
 				}
-				echo $record[$value] . " d</td>";
+				$days = floor($record[$value]/24);
+				$hours = $record[$value]%24;
+				echo "$days d $hours h</td>";
 			}
-			else if ($record[$value] >= 5)
+			else if ($record[$value] >= 5*24)
 			{
 				echo "<td class='TDcb'>";
 				if ($record['Running'] == 0 && $record['Hibernating'] == 0)
@@ -888,7 +890,9 @@ function DisplayRouterRow()
 				{
 					echo "<img src='/img/blank.gif' alt=' ' width='12px' />";
 				}
-				echo $record[$value] . " d</td>";
+				$days = floor($record[$value]/24);
+				$hours = $record[$value]%24;
+				echo "$days d $hours h</td>";
 			}
 			else
 			{
@@ -1639,7 +1643,7 @@ if (in_array("Bandwidth", $ColumnList_ACTIVE))
 
 if (in_array("Uptime", $ColumnList_ACTIVE))
 {
-	$query .= ", floor(((UNIX_TIMESTAMP() - (UNIX_TIMESTAMP($ActiveDescriptorTable.LastDescriptorPublished) + $OffsetFromGMT)) + CAST($ActiveDescriptorTable.Uptime AS DECIMAL)) / 86400) as Uptime";
+	$query .= ", floor(((UNIX_TIMESTAMP() - (UNIX_TIMESTAMP($ActiveDescriptorTable.LastDescriptorPublished) + $OffsetFromGMT)) + CAST($ActiveDescriptorTable.Uptime AS DECIMAL)) / 3600) as Uptime";
 }
 
 if (in_array("LastDescriptorPublished", $ColumnList_ACTIVE))
@@ -2010,19 +2014,19 @@ if ($CSInput != null)
 
 		if($CSMod == 'Equals')
 		{
-			$query .= "floor($ActiveDescriptorTable.Uptime / 86400) = '$CSInput_SAFE'";
+			$query .= "floor($ActiveDescriptorTable.Uptime / 3600) = '$CSInput_SAFE'";
 		}
 		else if($CSMod == 'Contains')
 		{
-			$query .= "floor($ActiveDescriptorTable.Uptime / 86400) like '%$CSInput_SAFE%'";
+			$query .= "floor($ActiveDescriptorTable.Uptime / 3600) like '%$CSInput_SAFE%'";
 		}
 		else if($CSMod == 'LessThan')
 		{
-			$query .= "floor($ActiveDescriptorTable.Uptime / 86400) < '$CSInput_SAFE'";
+			$query .= "floor($ActiveDescriptorTable.Uptime / 3600) < '$CSInput_SAFE'";
 		}
 		else if($CSMod == 'GreaterThan')
 		{
-			$query .= "floor($ActiveDescriptorTable.Uptime / 86400) > '$CSInput_SAFE'";
+			$query .= "floor($ActiveDescriptorTable.Uptime / 3600) > '$CSInput_SAFE'";
 		}
 	}
 	else if ($CSField == 'LastDescriptorPublished')
