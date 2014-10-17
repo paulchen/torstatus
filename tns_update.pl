@@ -684,7 +684,10 @@ while (<$torSocket>)
 $query1 .= join(', ', @query1_parts);
 # print "$query1\n";
 $dbresponse = $dbh->prepare($query1);
-$dbresponse->execute(@query1_params);
+$dbresponse->execute(@query1_params) or print "failed query: $query1\n";
+if($dbh->errstr) {
+	print "failed query: $query1";
+}
 
 $query2 .= join(', ', @query2_parts);
 # print "$query2\n";
