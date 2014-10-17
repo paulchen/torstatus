@@ -2345,7 +2345,7 @@ if($Hidden_Service_URL != null)
 <div style="text-align: center; width: 100%;"><a href="http://jlve2y45zacpbz6s.onion" style="text-decoration: underline; color: blue;">Access via hidden service</a></div>
 <div style="text-align: center; width: 100%;"><a href="stats" style="text-decoration: underline; color: blue;">Access statistics for tor.rueckgr.at by country/city</a></div>
 <div style="text-align: center; width: 100%;">
-<a href="onionoo" style="text-decoration: underline; color: blue;">Onionoo</a>
+<!-- <a href="onionoo" style="text-decoration: underline; color: blue;">Onionoo</a> -->
 <a href="atlas" style="text-decoration: underline; color: blue;">Atlas</a>
 <a href="compass" style="text-decoration: underline; color: blue;">Compass</a>
 </div>
