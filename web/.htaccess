@@ -1,5 +1,7 @@
 RewriteEngine On
 
+RewriteRule ^index\.php/ - [R=404]
+
 #RewriteCond %{HTTP_USER_AGENT}		^.*nagios.*$
 #RewriteRule .*				index-nagios.html
 
@@ -10,4 +12,5 @@ SetOutputFilter DEFLATE
 ExpiresActive On
 ExpiresByType image/vnd.microsoft.icon "access plus 1 year"
 FileETag none
+
 
