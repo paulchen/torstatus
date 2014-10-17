@@ -435,7 +435,7 @@ if (in_array("Bandwidth", $ColumnList_ACTIVE))
 
 if (in_array("Uptime", $ColumnList_ACTIVE))
 {
-	$query .= ", floor(CAST(((UNIX_TIMESTAMP() - (UNIX_TIMESTAMP($ActiveDescriptorTable.LastDescriptorPublished) + $OffsetFromGMT)) + $ActiveDescriptorTable.Uptime) AS SIGNED) / 86400) as Uptime";
+	$query .= ", floor(((UNIX_TIMESTAMP() - (UNIX_TIMESTAMP($ActiveDescriptorTable.LastDescriptorPublished) + $OffsetFromGMT)) + CAST($ActiveDescriptorTable.Uptime AS DECIMAL)) / 3600) as Uptime";
 }
 
 if (in_array("LastDescriptorPublished", $ColumnList_ACTIVE))
