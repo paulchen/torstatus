@@ -628,7 +628,11 @@ function DisplayRouterRow()
 	{
 		echo "<td class='TRr'>";
 	}
-	$countrycode = strtolower($record['CountryCode']);
+	$countrycode = '';
+	if(isset($record['CountryCode']))
+	{
+		$countrycode = strtolower($record['CountryCode']);
+	}
 	if ($countrycode != '' && !isset($country_codes[$countrycode]))
 	{
 		if(!isset($notified_missing_countries))
