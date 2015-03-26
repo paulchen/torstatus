@@ -66,7 +66,7 @@ if (!$session_name || !$plot_type)
 }
 
 # Start the session
-my $session = PHP::Session->new($session_name, { save_path => "/var/lib/php5/" });
+my $session = PHP::Session->new($session_name, { save_path => "/var/lib/php5/sessions/" });
 
 if ($plot_type eq "cc")
 {
