@@ -19,6 +19,18 @@ if (!preg_match("/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/",$ip))
 $pageTitle = "WHOIS Query";
 include("header.php");
 
+$query = "select ActiveNetworkStatusTable, ActiveDescriptorTable from Status";
+$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+$record = mysql_fetch_assoc($result);
+
+$ActiveNetworkStatusTable = $record['ActiveNetworkStatusTable'];
+
+// Populate variables from database
+$query = "select count(*) ips from $ActiveNetworkStatusTable where IP = '$ip'";
+$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+$record = mysql_fetch_assoc($result);
+$ips = $record['ips'];
+
 ?>
 <table width='100%' cellspacing='2' cellpadding='2'>
 <tr>
@@ -31,9 +43,26 @@ include("header.php");
 
 <tr>
 <td style="white-space: normal;" class='TRS'>
+<?php if($ips == 0): ?>
 <pre>
-<?php passthru("whois $ip"); ?>
+Sorry, this service can only to be used for querying data about Tor relays.
 </pre>
+<?php else: ?>
+<pre>
+<?php
+$m = new Memcached();
+$m->addServer('localhost', 11211);
+$key = "whois_$ip";
+$data = $m->get($key);
+if(!$data) {
+	exec("whois -h 193.0.6.135 $ip", $lines);
+	$data = implode("\n", $lines);
+}
+echo $data;
+$m->set($key, $data, 3600);
+?>
+</pre>
+<?php endif; ?>
 </td>
 </tr>
 
