@@ -43,6 +43,10 @@ use MIME::Base64;
 use LWP::Simple;
 use Date::Parse;
 use File::Touch;
+use Time::HiRes qw(gettimeofday);
+use Parallel::ForkManager;
+
+print gettimeofday() . "\n";
 
 # Set the constant to break out of getting the hostnames
 use constant TIMEOUT => 1;
@@ -234,6 +238,8 @@ unless ($response =~ /250+/) { die "There was an error retrieving descriptors.";
 # Now iterate through each line of response
 my %currentRouter;
 
+my $router_count = 0;
+
 # print "3\n";
 while (<$torSocket>)
 {
@@ -256,6 +262,8 @@ while (<$torSocket>)
 		my $address = $2;
 		my $or = $3;
 		my $dir = $5;
+
+		$router_count++;
 		
 		if($router == 1) {
 			print "Now " . $currentRouter{'nickname'} . " and " . $nickname . " get mixed up.\n";
@@ -321,7 +329,7 @@ while (<$torSocket>)
 	
 	# Format for the onion-key line
 	# "onion-key" NL a public key in PEM format
-	if ($line =~ /onion-key/ && $line !~ /ntor-onion-key/)
+	if ($line =~ /onion-key/ && $line !~ /ntor-onion-key/ && $line !~ /crosscert/)
 	{
 		my $onion_key;
 		# Continue to receive lines until the end of the key
@@ -330,7 +338,7 @@ while (<$torSocket>)
 		while ($current_line !~ /-----END RSA PUBLIC KEY-----/)
 		{
 			$current_line = <$torSocket>;
-			# print "z: $current_line\n";
+			# print "z1: $current_line\n";
 			if($iteration == 0 && $current_line !~ /-----BEGIN RSA PUBLIC KEY-----/)
 			{
 				$line = $current_line;
@@ -361,7 +369,7 @@ while (<$torSocket>)
 		while ($current_line !~ /-----END RSA PUBLIC KEY-----/)
 		{
 			$current_line = <$torSocket>;
-			# print "z: $current_line\n";
+			# print "z2: $current_line\n";
 			if($iteration == 0 && $current_line !~ /-----BEGIN RSA PUBLIC KEY-----/)
 			{
 				$line = $current_line;
@@ -482,6 +490,7 @@ while (<$torSocket>)
 		while ($current_line !~ /-----END SIGNATURE-----/)
 		{
 			$current_line = <$torSocket>;
+			# print "z3: $current_line\n";
 			$signature .= $current_line;
 		}
 		chomp($signature);
@@ -681,6 +690,10 @@ while (<$torSocket>)
 #	print "a...\n";
 }
 
+#print "y...\n";
+
+print "Number of routers: $router_count\n";
+
 $query1 .= join(', ', @query1_parts);
 # print "$query1\n";
 $dbresponse = $dbh->prepare($query1);
@@ -724,6 +737,9 @@ my @query3_params = ();
 #$dhresponse = $dbh->prepare($query);
 
 #print "4\n";
+#
+my $routers_processed = 0;
+
 while (<$torSocket>)
 {
 	chop(my $line = $_);
@@ -733,6 +749,8 @@ while (<$torSocket>)
 #	print "y: $line\n";	
 	if ($line =~ /250 OK/) { last; } # Break when done
 
+	print gettimeofday() . "\n";
+
 	# Format for the "r" line
 	# "r" SP nickname SP identity SP digest SP publication SP IP SP ORPort
 	# SP DirPort NL
@@ -741,7 +759,11 @@ while (<$torSocket>)
 	{
 		# If there is previous data, it should be saved now
 		#
+		#
+		$routers_processed++;
+		print "Processing router " . $currentRouter{'Nickname'} . " ($routers_processed/$router_count)...\n";
 
+		print "A: " . gettimeofday() . "\n";
 		if ($currentRouter{'Nickname'})
 		{
 			push(@query3_parts, '( ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ?)');
@@ -815,6 +837,7 @@ while (<$torSocket>)
 		$currentRouter{'ORPort'} = $7;
 		$currentRouter{'DirPort'} = $8;
 
+		print "B1: " . gettimeofday() . "\n";
 		# We need to find the country of the IP
 		if ($geoIPCache{$6})
 		{
@@ -826,14 +849,16 @@ while (<$torSocket>)
 			$geoIPCache{$6} = $currentRouter{'Country'};
 		}
 
+		print "B2: " . gettimeofday() . "\n";
 		# And the host by addr
-		$currentRouter{'Hostname'} = lookup($6);
+#		$currentRouter{'Hostname'} = lookup($6);
 		# If the hostname was not found, it should be an IP
-		unless ($currentRouter{'Hostname'})
-		{
-			$currentRouter{'Hostname'} = $6;
+#		unless ($currentRouter{'Hostname'})
+#		{
+#			$currentRouter{'Hostname'} = $6;
+#		}
 		}
-		}
+		print "C: " . gettimeofday() . "\n";
 	}
 
 	# Format for the "s" line
@@ -846,14 +871,62 @@ while (<$torSocket>)
 			$currentRouter{$flag} = 1;
 		}
 	}
+	print gettimeofday() . "\n";
 }
 
 my $query3x = $query3 . join(', ', @query3_parts);
 #print "$query3x\n";
 $dbresponse = $dbh->prepare($query3x);
 $dbresponse->execute(@query3_params);
+$dbh->disconnect();
+
+my $dbh = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$config{'SQL_Server'},$config{'SQL_User'},$config{'SQL_Pass'}, {
+	PrintError => 0,
+	RaiseError => 1
+}) or die "Unable to connect to MySQL server";
+
+my $pm = Parallel::ForkManager->new(20);
+
+$query = "SELECT Fingerprint, IP FROM NetworkStatus${descriptorTable}";
+$dbresponse = $dbh->prepare($query);
+$dbresponse->execute();
+
+DATA_LOOP:
+while(@record = $dbresponse->fetchrow_array) {
+	$fingerprint = $record[0];
+	$ip = $record[1];
+
+	my $pid = $pm->start and next DATA_LOOP;
+
+	$hostname = lookup($ip);
+	# If the hostname was not found, it should be an IP
+	unless ($hostname) {
+		$hostname = $ip;
+	}
+
+	$query2 = "UPDATE NetworkStatus${descriptorTable} SET Hostname = ? WHERE Fingerprint = ?";
+
+	print "Hostname: $hostname, fingerprint: $fingerprint, ip: $ip\n";
+	my $dbhx = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$config{'SQL_Server'},$config{'SQL_User'},$config{'SQL_Pass'}, {
+		PrintError => 0,
+		RaiseError => 1
+	}) or die "Unable to connect to MySQL server";
+
+	my $dbresponse = $dbhx->prepare($query2);
+	$dbresponse->execute(($hostname, $fingerprint));
+	$dbhx->disconnect();
+
+	$pm->finish;
+}
+
+$pm->wait_all_children;
 
 # exit;
+
+my $dbh = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$config{'SQL_Server'},$config{'SQL_User'},$config{'SQL_Pass'}, {
+	PrintError => 0,
+	RaiseError => 1
+}) or die "Unable to connect to MySQL server";
 
 # Update the opinion source
 # We need to find out who we are
