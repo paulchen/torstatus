@@ -2180,6 +2180,8 @@ if ($CSInput != null)
 	}
 }
 
+$query .= " group by $ActiveDescriptorTable.Fingerprint";
+
 if ($SR == 'Name')
 {
 	$query = $query . " order by " . $SR . " " . $SO;
