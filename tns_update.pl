@@ -874,10 +874,12 @@ while (<$torSocket>)
 	print gettimeofday() . "\n";
 }
 
-my $query3x = $query3 . join(', ', @query3_parts);
-#print "$query3x\n";
-$dbresponse = $dbh->prepare($query3x);
-$dbresponse->execute(@query3_params);
+if(scalar(@query3_parts) > 0) {
+	my $query3x = $query3 . join(', ', @query3_parts);
+	#print "$query3x\n";
+	$dbresponse = $dbh->prepare($query3x) or print "failed query: $query3x\n";
+	$dbresponse->execute(@query3_params) or print "failed query: $query3x\n";
+}
 $dbh->disconnect();
 
 my $dbh = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$config{'SQL_Server'},$config{'SQL_User'},$config{'SQL_Pass'}, {
@@ -885,7 +887,7 @@ my $dbh = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$co
 	RaiseError => 1
 }) or die "Unable to connect to MySQL server";
 
-my $pm = Parallel::ForkManager->new(20);
+my $pm = Parallel::ForkManager->new(10);
 
 $query = "SELECT Fingerprint, IP FROM NetworkStatus${descriptorTable}";
 $dbresponse = $dbh->prepare($query);
