@@ -16,6 +16,8 @@ $ActiveNetworkStatusTable = null;
 $link = mysql_connect($SQL_Server, $SQL_User, $SQL_Pass) or die('Could not connect: ' . mysql_error());
 mysql_select_db($SQL_Catalog) or die('Could not open specified database');
 
+include('request_log.php');
+
 // Get active network status table from database
 $query = "select ActiveNetworkStatusTable from Status";
 $result = mysql_query($query) or die('Query failed: ' . mysql_error());

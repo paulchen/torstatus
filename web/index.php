@@ -933,6 +933,8 @@ $TimeStart = microtime(true);
 $link = mysql_connect($SQL_Server, $SQL_User, $SQL_Pass) or die_503('Could not connect: ' . mysql_error());
 mysql_select_db($SQL_Catalog) or die_503('Could not open specified database');
 
+include('request_log.php');
+
 // Read SortRequest (SR) and SortOrder (SO) variables -- These come from POST, GET, or SESSION
 
 // POST
@@ -2349,7 +2351,7 @@ if($Hidden_Service_URL != null)
 </div></div></div>
 
 <div style="text-align: center; width: 100%;"><a href="http://jlve2y45zacpbz6s.onion" style="text-decoration: underline; color: blue;">Access via hidden service</a></div>
-<div style="text-align: center; width: 100%;"><a href="stats" style="text-decoration: underline; color: blue;">Access statistics for tor.rueckgr.at by country/city</a></div>
+<!-- <div style="text-align: center; width: 100%;"><a href="stats" style="text-decoration: underline; color: blue;">Access statistics for tor.rueckgr.at by country/city</a></div> -->
 <div style="text-align: center; width: 100%;">
 <!-- <a href="onionoo" style="text-decoration: underline; color: blue;">Onionoo</a> -->
 <a href="atlas" style="text-decoration: underline; color: blue;">Atlas</a>

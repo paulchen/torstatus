@@ -8,6 +8,8 @@ include("config.php");
 $link = mysql_connect($SQL_Server, $SQL_User, $SQL_Pass) or die('Could not connect: ' . mysql_error());
 mysql_select_db($SQL_Catalog) or die('Could not open specified database');
 
+include('request_log.php');
+
 $Self = $_SERVER['PHP_SELF'];
 
 // Determine whether or not SSL is being used

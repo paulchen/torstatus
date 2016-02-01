@@ -202,6 +202,8 @@ function DisplayRouterRow()
 $link = mysql_connect($SQL_Server, $SQL_User, $SQL_Pass) or die('Could not connect: ' . mysql_error());
 mysql_select_db($SQL_Catalog) or die('Could not open specified database');
 
+include('request_log.php');
+
 // Read all variables from session
 if (isset($_SESSION["SR"]))
 {
