@@ -3,15 +3,7 @@
 // Copyright (c) 2006-2007, Joseph B. Kowalski
 // See LICENSE for licensing information 
 
-// Start new session
-session_start();
-
-// Include configuration settings
-include("config.php");
-
-// Declare and initialize variables
-$ActiveNetworkStatusTable = null;
-$ActiveDescriptorTable = null;
+require_once('common.php');
 
 $HeaderRowString = "";
 
@@ -197,12 +189,6 @@ function DisplayRouterRow()
 
 	echo "\n";
 }
-
-// Connect to database, select schema
-$link = mysql_connect($SQL_Server, $SQL_User, $SQL_Pass) or die('Could not connect: ' . mysql_error());
-mysql_select_db($SQL_Catalog) or die('Could not open specified database');
-
-include('request_log.php');
 
 // Read all variables from session
 if (isset($_SESSION["SR"]))
@@ -413,14 +399,6 @@ if ($CSInput != null)
 		$CSInput = substr($CSInput,0,128);
 	}
 }
-
-// Get active table information from database
-$query = "select ActiveNetworkStatusTable, ActiveDescriptorTable from Status";
-$result = mysql_query($query) or die('Query failed: ' . mysql_error());
-$record = mysql_fetch_assoc($result);
-
-$ActiveNetworkStatusTable = $record['ActiveNetworkStatusTable'];
-$ActiveDescriptorTable = $record['ActiveDescriptorTable'];
 
 // Prepare and execute master router query
 $query = "select $ActiveNetworkStatusTable.Name, $ActiveNetworkStatusTable.Fingerprint";
@@ -702,7 +680,7 @@ if ($CSInput != null)
 
 	$query .= $QueryPrepend;
 
-	$CSInput_SAFE = mysql_real_escape_string($CSInput);
+	$CSInput_SAFE = $mysqli->escape_string($CSInput);
 
 	if ($CSField == 'Fingerprint')
 	{
@@ -972,7 +950,10 @@ else
 }
 
 // die($query);
-$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+$result = $mysqli->query($query);
+if(!$result) {
+	die_503('Query failed: ' . $mysql->error);
+}
 
 // Generate header row
 GenerateHeaderRow();
@@ -984,12 +965,11 @@ header('Content-disposition: inline; filename=Tor_query_EXPORT.csv');
 
 echo $HeaderRowString;
 
-while ($record = mysql_fetch_assoc($result)) 
+while ($record = $result->fetch_assoc()) 
 {
 	DisplayRouterRow();
 }
+$result->free();
 
-// Close connection
-mysql_close($link);
+$mysqli->close();
 
-?>

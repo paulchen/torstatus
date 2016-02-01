@@ -2,14 +2,6 @@
 
 // Header file
 
-include("config.php");
-
-// Connect to database, select schema
-$link = mysql_connect($SQL_Server, $SQL_User, $SQL_Pass) or die('Could not connect: ' . mysql_error());
-mysql_select_db($SQL_Catalog) or die('Could not open specified database');
-
-include('request_log.php');
-
 $Self = $_SERVER['PHP_SELF'];
 
 // Determine whether or not SSL is being used
@@ -27,12 +19,7 @@ if ($DetermineUsingSSL == 1)
 	}
 }
 
-// Retrieve the mirror list from the database
-$query = "SELECT mirrors FROM `Mirrors` WHERE id=1";
-$result_mirrors = mysql_query($query) or die('There was an error getting the mirror list: ' . mysql_error());
-$mirrorListRow = mysql_fetch_row($result_mirrors);
-$mirrorList = $mirrorListRow[0];
-
+fetch_mirrors();
 
 ?><!DOCTYPE html 
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"

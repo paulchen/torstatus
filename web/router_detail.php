@@ -3,15 +3,7 @@
 // Copyright (c) 2006-2007, Joseph B. Kowalski
 // See LICENSE for licensing information 
 
-// Start new session
-session_start();
-
-// Include configuration settings
-include("config.php");
-
-// Declare and initialize variables
-$ActiveNetworkStatusTable = null;
-$ActiveDescriptorTable = null;
+require_once('common.php');
 
 $Name = null;
 $IP = null;
@@ -57,21 +49,9 @@ if (strlen($Fingerprint) != 40)
 	$Fingerprint = null;
 }
 
-// Get active tables from database
-$link = mysql_connect($SQL_Server, $SQL_User, $SQL_Pass) or die('Could not connect: ' . mysql_error());
-mysql_select_db($SQL_Catalog) or die('Could not open specified database');
-
-$query = "select ActiveNetworkStatusTable, ActiveDescriptorTable from Status";
-$result = mysql_query($query) or die('Query failed: ' . mysql_error());
-$record = mysql_fetch_assoc($result);
-
-$ActiveNetworkStatusTable = $record['ActiveNetworkStatusTable'];
-$ActiveDescriptorTable = $record['ActiveDescriptorTable'];
-
 // Populate variables from database
 $query = "select $ActiveNetworkStatusTable.Name, $ActiveDescriptorTable.LastDescriptorPublished, $ActiveNetworkStatusTable.IP, $ActiveNetworkStatusTable.Hostname, $ActiveNetworkStatusTable.ORPort, $ActiveNetworkStatusTable.DirPort, $ActiveDescriptorTable.Platform, $ActiveDescriptorTable.Contact, CAST(((UNIX_TIMESTAMP() - (UNIX_TIMESTAMP($ActiveDescriptorTable.LastDescriptorPublished) + $OffsetFromGMT)) + $ActiveDescriptorTable.Uptime) AS SIGNED) as Uptime, $ActiveDescriptorTable.BandwidthMAX, $ActiveDescriptorTable.BandwidthBURST, $ActiveDescriptorTable.BandwidthOBSERVED, $ActiveDescriptorTable.OnionKey, $ActiveDescriptorTable.SigningKey, $ActiveDescriptorTable.WriteHistoryLAST, $ActiveDescriptorTable.WriteHistoryINC, $ActiveDescriptorTable.WriteHistorySERDATA, $ActiveDescriptorTable.ReadHistoryLAST, $ActiveDescriptorTable.ReadHistoryINC, $ActiveDescriptorTable.ReadHistorySERDATA, $ActiveDescriptorTable.ExitPolicySERDATA, $ActiveDescriptorTable.FamilySERDATA, $ActiveNetworkStatusTable.CountryCode, $ActiveDescriptorTable.Hibernating, $ActiveNetworkStatusTable.FAuthority, $ActiveNetworkStatusTable.FBadDirectory, $ActiveNetworkStatusTable.FBadExit, $ActiveNetworkStatusTable.FExit, $ActiveNetworkStatusTable.FFast, $ActiveNetworkStatusTable.FGuard, $ActiveNetworkStatusTable.FNamed, $ActiveNetworkStatusTable.FStable, $ActiveNetworkStatusTable.FRunning, $ActiveNetworkStatusTable.FValid, $ActiveNetworkStatusTable.FV2Dir from $ActiveNetworkStatusTable inner join $ActiveDescriptorTable on $ActiveNetworkStatusTable.Fingerprint = $ActiveDescriptorTable.Fingerprint where $ActiveNetworkStatusTable.Fingerprint = '$Fingerprint'";
-$result = mysql_query($query) or die('Query failed: ' . mysql_error());
-$record = mysql_fetch_assoc($result);
+$record = db_query_single_row($query);
 
 $Name = $record['Name'];
 $LastDescriptorPublished = $record['LastDescriptorPublished'];
@@ -177,7 +157,7 @@ if ($Name == null)
 	echo "</html>\n";
 
 	// Close connection
-	mysql_close($link);
+	$mysqli->close();
 
 	exit;
 }
@@ -466,6 +446,6 @@ include("header.php");
 <?php
 
 // Close connection
-mysql_close($link);
+$mysqli->close();
 
 ?>

@@ -3,15 +3,7 @@
 // Copyright (c) 2006-2007, Joseph B. Kowalski
 // See LICENSE for licensing information 
 
-// Start new session
-session_start();
-
-// Include configuration settings
-include("config.php");
-
-// Declare and initialize variables
-$ActiveNetworkStatusTable = null;
-$ActiveDescriptorTable = null;
+require_once('common.php');
 
 $Self = $_SERVER['PHP_SELF'];
 
@@ -102,10 +94,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 	}
 }
 
-// Connect to database, select schema
-$link = mysql_connect($SQL_Server, $SQL_User, $SQL_Pass) or die('Could not connect: ' . mysql_error());
-mysql_select_db($SQL_Catalog) or die('Could not open specified database');
-
 // Variable scrubbing
 if (strlen($QueryIP) > 15)
 {
@@ -113,7 +101,7 @@ if (strlen($QueryIP) > 15)
 }
 else
 {
-	$QueryIP = mysql_real_escape_string($QueryIP);
+	$QueryIP = $mysqli->escape_string($QueryIP);
 }
 if ($QueryIP != null)
 {
@@ -134,7 +122,7 @@ if (strlen($DestinationIP) > 15)
 }
 else
 {
-	$DestinationIP = mysql_real_escape_string($DestinationIP);
+	$DestinationIP = $mysqli->escape_string($DestinationIP);
 }
 if ($DestinationIP != null)
 {
@@ -155,7 +143,7 @@ if (strlen($DestinationPort) > 5)
 }
 else
 {
-	$DestinationPort = mysql_real_escape_string($DestinationPort);
+	$DestinationPort = $mysqli->escape_string($DestinationPort);
 }
 if ($DestinationPort != null)
 {
@@ -169,20 +157,11 @@ if ($DestinationPort != null)
 	}
 }
 
-// Get active table information from database
-$query = "select ActiveNetworkStatusTable, ActiveDescriptorTable from Status";
-$result = mysql_query($query) or die('Query failed: ' . mysql_error());
-$record = mysql_fetch_assoc($result);
-
-$ActiveNetworkStatusTable = $record['ActiveNetworkStatusTable'];
-$ActiveDescriptorTable = $record['ActiveDescriptorTable'];
-
 if ($QueryIP != null)
 {
 	// Determine if query IP exists in database as a Tor server
 	$query = "select count(*) as Count from $ActiveNetworkStatusTable where IP = '$QueryIP'";
-	$result = mysql_query($query) or die('Query failed: ' . mysql_error());
-	$record = mysql_fetch_assoc($result);
+	$record = db_query_single_row($query);
 	
 	$QueryIPDBCount = $record['Count'];
 	
@@ -195,9 +174,12 @@ if ($QueryIP != null)
 	if ($PositiveMatch_IP == 1 && $DestinationIP != null && $DestinationPort != null)
 	{
 		$query = "select $ActiveNetworkStatusTable.Name, $ActiveNetworkStatusTable.Fingerprint, $ActiveDescriptorTable.ExitPolicySERDATA from $ActiveNetworkStatusTable inner join $ActiveDescriptorTable on $ActiveNetworkStatusTable.Fingerprint = $ActiveDescriptorTable.Fingerprint where $ActiveNetworkStatusTable.IP = '$QueryIP'";
-		$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+		$result = $mysqli->query($query);
+		if(!$result) {
+			die_503('Query failed: ' . $mysqli->error);
+		}
 	
-		while ($record = mysql_fetch_assoc($result))
+		while ($record = $result->fetch_assoc())
 		{ 
 			$Count++;			
 
@@ -287,20 +269,25 @@ if ($QueryIP != null)
 				}
 			}
 		}
+		$result->free();
 	}
 	// Get only name and fingerprint if match was found but Destination IP/Port were not specified
 	else if ($PositiveMatch_IP == 1)
 	{
 		$query = "select $ActiveNetworkStatusTable.Name, $ActiveNetworkStatusTable.Fingerprint from $ActiveNetworkStatusTable where $ActiveNetworkStatusTable.IP = '$QueryIP'";
-		$result = mysql_query($query) or die('Query failed: ' . mysql_error());
+		$result = $mysqli->query($query);
+		if(!$result) {
+			die_503('Query failed: ' . $mysqli->error);
+		}
 
-		while ($record = mysql_fetch_assoc($result))
+		while ($record = $result->fetch_assoc())
 		{
 			$Count++;
 	
 			$TorNodeName[$Count] = $record['Name'];
 			$TorNodeFP[$Count] = $record['Fingerprint'];
 		}
+		$result->free();
 	}
 }
 
@@ -427,6 +414,5 @@ Policy would permit it to exit to a certain destination IP address and port.</b>
 <?php
 
 // Close connection
-mysql_close($link);
+$mysqli->close();
 
-?>

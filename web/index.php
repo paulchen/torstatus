@@ -3,24 +3,7 @@
 // Copyright (c) 2006-2007, Joseph B. Kowalski
 // See LICENSE for licensing information 
 
-// Start new session
-session_start();
-
-//ini_set('error_reporting', E_ALL ^ E_NOTICE);
-function die_503($text) {
-	header('HTTP/1.1 503 Service Temporarily Unavailable');
-	header('Status: 503 Service Temporarily Unavailable');
-	die();
-}
-
-// Include configuration settings
-include("config.php");
-
-// Declare and initialize variables
-$LastUpdate = null;
-$LastUpdateElapsed = null;
-$ActiveNetworkStatusTable = null;
-$ActiveDescriptorTable = null;
+require_once('common.php');
 
 $HeaderRowString = "";
 
@@ -642,8 +625,8 @@ function DisplayRouterRow()
 
 		if(!in_array($countrycode, $notified_missing_countries))
 		{
-			$parameter = mysql_real_escape_string($countrycode);
-			mysql_query("INSERT INTO missing_countries (country_code) VALUES ('$parameter') ON DUPLICATE KEY UPDATE country_code = country_code" );
+			$parameter = $mysqli->escape_string($countrycode);
+			$mysqli->query("INSERT INTO missing_countries (country_code) VALUES ('$parameter') ON DUPLICATE KEY UPDATE country_code = country_code" );
 
 			$notified_missing_countries[] = $countrycode;
 		}
@@ -657,8 +640,8 @@ function DisplayRouterRow()
 
 		if(!in_array($countrycode, $notified_missing_flags))
 		{
-			$parameter = mysql_real_escape_string($countrycode);
-			mysql_query("INSERT INTO missing_flags (country_code) VALUES ('$parameter') ON DUPLICATE KEY UPDATE country_code = country_code" );
+			$parameter = $mysqli->escape_string($countrycode);
+			$mysqli->query("INSERT INTO missing_flags (country_code) VALUES ('$parameter') ON DUPLICATE KEY UPDATE country_code = country_code" );
 
 			$notified_missing_flags[] = $countrycode;
 		}
@@ -925,15 +908,6 @@ function DisplayRouterRow()
 
 	echo "</tr>\n";
 }
-
-// Get script start time
-$TimeStart = microtime(true);
-
-// Connect to database, select schema
-$link = mysql_connect($SQL_Server, $SQL_User, $SQL_Pass) or die_503('Could not connect: ' . mysql_error());
-mysql_select_db($SQL_Catalog) or die_503('Could not open specified database');
-
-include('request_log.php');
 
 // Read SortRequest (SR) and SortOrder (SO) variables -- These come from POST, GET, or SESSION
 
@@ -1471,32 +1445,15 @@ else
 	$_SESSION['CSInput'] = $CSInput;
 }
 
-// Get last update and active table information from database
-$query = "select LastUpdate, LastUpdateElapsed, ActiveNetworkStatusTable, ActiveDescriptorTable from Status";
-$result = mysql_query($query) or die_503('Query failed: ' . mysql_error());
-$record = mysql_fetch_assoc($result);
-
-$LastUpdate = $record['LastUpdate'];
-$LastUpdateElapsed = $record['LastUpdateElapsed'];
-$ActiveNetworkStatusTable = $record['ActiveNetworkStatusTable'];
-$ActiveDescriptorTable = $record['ActiveDescriptorTable'];
-
 // Get total number of routers from database
 $query = "select count(*) as Count from $ActiveNetworkStatusTable";
-$result = mysql_query($query);
-if (!$result) 
-{
-	echo "It appears that the ".$SQL_Catalog." database has not yet been populated with information.  Please run tns_update.pl from within your root TorStatus directory.  If you continue to run into problems, please submit a bug report at <a href='http://project.torstatus.kgprog.com/'>http://project.torstatus.kgprog.com</a>.";
-	exit;
-}
-$record = mysql_fetch_assoc($result);
+$record = db_query_single_row($query);
 
 $RouterCount = $record['Count'];
 
 // Get details on Network Status Source router from the database
 $query = "select Name, IP, ORPort, DirPort, Fingerprint, Platform, LastDescriptorPublished, OnionKey, SigningKey, Contact, DescriptorSignature from NetworkStatusSource where ID = 1";
-$result = mysql_query($query) or die_503('Query failed: ' . mysql_error());
-$record = mysql_fetch_assoc($result);
+$record = db_query_single_row($query);
 
 $Name = $record['Name'];
 $IP = $record['IP'];
@@ -1511,16 +1468,14 @@ $Contact = $record['Contact'];
 $DescriptorSignature = $record['DescriptorSignature'];
 
 $query = "select Hostname, CountryCode from $ActiveNetworkStatusTable where Fingerprint = '$Fingerprint'";
-$result = mysql_query($query) or die_503('Query failed: ' . mysql_error());
-$record = mysql_fetch_assoc($result);
+$record = db_query_single_row($query);
 
 $Hostname = $record['Hostname'];
 $CountryCode = $record['CountryCode'];
 
 // Determine if client IP exists in database as a Tor server
 $query = "select count(*) as Count from $ActiveNetworkStatusTable where IP = '$RemoteIP'";
-$result = mysql_query($query) or die_503('Query failed: ' . mysql_error());
-$record = mysql_fetch_assoc($result);
+$record = db_query_single_row($query);
 
 $RemoteIPDBCount = $record['Count'];
 
@@ -1533,9 +1488,12 @@ if ($RemoteIPDBCount > 0)
 if ($PositiveMatch_IP == 1)
 {
 	$query = "select $ActiveNetworkStatusTable.Name, $ActiveNetworkStatusTable.Fingerprint, $ActiveDescriptorTable.ExitPolicySERDATA from $ActiveNetworkStatusTable inner join $ActiveDescriptorTable on $ActiveNetworkStatusTable.Fingerprint = $ActiveDescriptorTable.Fingerprint where $ActiveNetworkStatusTable.IP = '$RemoteIP'";
-	$result = mysql_query($query) or die_503('Query failed: ' . mysql_error());
+	$result = $mysqli->query($query);
+	if(!$result) {
+		die_503('Query failed: ' . $mysqli->error);
+	}
 
-	while ($record = mysql_fetch_assoc($result))
+	while ($record = $result->fetch_assoc())
 	{ 
 		$Count++;
 
@@ -1625,12 +1583,13 @@ if ($PositiveMatch_IP == 1)
 			}
 		}
 	}
+
+	$result->free();
 }
 
 // Get descriptor count
 $query = "select count(*) as Count from $ActiveDescriptorTable";
-$result = mysql_query($query) or die_503('Query failed: ' . mysql_error());
-$record = mysql_fetch_assoc($result);
+$record = db_query_single_row($query);
 
 $DescriptorCount = $record['Count'];
 
@@ -1926,7 +1885,7 @@ if ($CSInput != null)
 
 	$query .= $QueryPrepend;
 
-	$CSInput_SAFE = mysql_real_escape_string($CSInput);
+	$CSInput_SAFE = $mysqli->escape_string($CSInput);
 
 	if ($CSField == 'Fingerprint')
 	{
@@ -2197,13 +2156,12 @@ else
 	$query = $query . " order by " . $SR . " " . $SO . ", Name Asc";
 }
 
-$result = mysql_query($query) or die_503('Query failed: ' . mysql_error());
+$result = $mysqli->query($query);
+if(!$result) {
+	die_503('Query failed: ' . $mysqli->error);
+}
 
-// Retrieve the mirror list from the database
-$query = "SELECT mirrors FROM `Mirrors` WHERE id=1";
-$result_mirrors = mysql_query($query) or die_503('There was an error getting the mirror list: ' . mysql_error());
-$mirrorListRow = mysql_fetch_row($result_mirrors);
-$mirrorList = $mirrorListRow[0];
+fetch_mirrors();
 
 ?><!DOCTYPE html 
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -2376,7 +2334,7 @@ GenerateHeaderRow();
 echo $HeaderRowString;
 
 // Loop through and display all routers returned by query
-while ($record = mysql_fetch_assoc($result)) 
+while ($record = $result->fetch_assoc()) 
 {
 
 	if ($RowCounter < $ColumnHeaderInterval)
@@ -2399,6 +2357,7 @@ while ($record = mysql_fetch_assoc($result))
 		$RowCounter = 1;
 	}
 }
+$result->free();
 ?>
 </table>
 </td>
@@ -2438,9 +2397,8 @@ $query = "select
 	(select count(*) from $ActiveNetworkStatusTable where FV2Dir = '1') as 'V2Dir',
 	(select count(*) from $ActiveNetworkStatusTable where FHSDir = '1') as 'HSDir',
 	(select count(*) from $ActiveNetworkStatusTable where DirPort > 0) as 'DirMirror'";
-	
-$result = mysql_query($query) or die_503('Query failed: ' . mysql_error());
-$record = mysql_fetch_assoc($result);
+
+$record = db_query_single_row($query);
 
 // Display total number of routers
 if ($RouterCount != 0)
@@ -2974,7 +2932,7 @@ function toggleASD()
 <?php
 
 // Close connection
-mysql_close($link);
+$mysqli->close();
 
 // Register session variable to mark that this page has been loaded
 if (!isset($_SESSION['IndexVisited'])) 

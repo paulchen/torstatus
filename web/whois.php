@@ -3,11 +3,7 @@
 // Copyright (c) 2006-2007, Joseph B. Kowalski
 // See LICENSE for licensing information 
 
-// Start new session
-session_start();
-
-// Include configuration settings
-include("config.php");
+require_once('common.php');
 
 $ip = $_GET['ip'];
 if (!preg_match("/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/",$ip))
@@ -20,15 +16,13 @@ $pageTitle = "WHOIS Query";
 include("header.php");
 
 $query = "select ActiveNetworkStatusTable, ActiveDescriptorTable from Status";
-$result = mysql_query($query) or die('Query failed: ' . mysql_error());
-$record = mysql_fetch_assoc($result);
+$record = db_query_single_row($query);
 
 $ActiveNetworkStatusTable = $record['ActiveNetworkStatusTable'];
 
 // Populate variables from database
 $query = "select count(*) ips from $ActiveNetworkStatusTable where IP = '$ip'";
-$result = mysql_query($query) or die('Query failed: ' . mysql_error());
-$record = mysql_fetch_assoc($result);
+$record = db_query_single_row($query);
 $ips = $record['ips'];
 
 ?>
@@ -81,6 +75,6 @@ $m->set($key, $data, 3600);
 <?php
 
 // Close connection
-mysql_close($link);
+$mysqli->close();
 
 ?>
