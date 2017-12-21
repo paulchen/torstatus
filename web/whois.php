@@ -49,7 +49,8 @@ $m->addServer('localhost', 11211);
 $key = "whois_$ip";
 $data = $m->get($key);
 if(!$data) {
-	exec("whois -h 193.0.6.135 $ip", $lines);
+#	exec("whois -h 193.0.6.135 $ip", $lines);
+	exec("whois $ip", $lines);
 	$data = implode("\n", $lines);
 }
 echo $data;
