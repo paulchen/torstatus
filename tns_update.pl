@@ -37,7 +37,7 @@
 # Include the required packages
 use DBI;
 use IO::Socket::INET;
-use serialize;
+use PHP::Serialization qw(serialize unserialize);
 use Geo::IP;
 use MIME::Base64;
 use LWP::Simple;
@@ -694,23 +694,29 @@ while (<$torSocket>)
 
 print "Number of routers: $router_count\n";
 
-$query1 .= join(', ', @query1_parts);
-# print "$query1\n";
-$dbresponse = $dbh->prepare($query1);
-$dbresponse->execute(@query1_params) or print "failed query: $query1\n";
-if($dbh->errstr) {
-	print "failed query: $query1";
+if(scalar(@query1_parts) > 0) {
+	$query1 .= join(', ', @query1_parts);
+	# print "$query1\n";
+	$dbresponse = $dbh->prepare($query1);
+	$dbresponse->execute(@query1_params) or print "failed query: $query1\n";
+	if($dbh->errstr) {
+		print "failed query: $query1";
+	}
 }
 
-$query2 .= join(', ', @query2_parts);
-# print "$query2\n";
-$dbresponse = $dbh->prepare($query2);
-$dbresponse->execute(@query2_params);
+if(scalar(@query2_parts) > 0) {
+	$query2 .= join(', ', @query2_parts);
+	# print "$query2\n";
+	$dbresponse = $dbh->prepare($query2);
+	$dbresponse->execute(@query2_params);
+}
 
-$query4 .= join(', ', @query4_parts);
-# print "$query4\n";
-$dbresponse = $dbh->prepare($query4);
-$dbresponse->execute(@query4_params);
+if(scalar(@query4_parts) > 0) {
+	$query4 .= join(', ', @query4_parts);
+	# print "$query4\n";
+	$dbresponse = $dbh->prepare($query4);
+	$dbresponse->execute(@query4_params);
+}
 
 # print("3\n");
 
@@ -887,7 +893,7 @@ my $dbh = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$co
 	RaiseError => 1
 }) or die "Unable to connect to MySQL server";
 
-my $pm = Parallel::ForkManager->new(10);
+my $pm = Parallel::ForkManager->new(5);
 
 $query = "SELECT Fingerprint, IP FROM NetworkStatus${descriptorTable}";
 $dbresponse = $dbh->prepare($query);
