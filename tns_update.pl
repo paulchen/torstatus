@@ -893,16 +893,20 @@ my $dbh = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$co
 	RaiseError => 1
 }) or die "Unable to connect to MySQL server";
 
-my $pm = Parallel::ForkManager->new(5);
+my $pm = Parallel::ForkManager->new(30);
 
 $query = "SELECT Fingerprint, IP FROM NetworkStatus${descriptorTable}";
 $dbresponse = $dbh->prepare($query);
 $dbresponse->execute();
 
+my $lookup_counter = 0;
 DATA_LOOP:
 while(@record = $dbresponse->fetchrow_array) {
 	$fingerprint = $record[0];
 	$ip = $record[1];
+
+	$lookup_counter++;
+	print gettimeofday() . ": Looking up $ip ($lookup_counter/$router_count)\n";
 
 	my $pid = $pm->start and next DATA_LOOP;
 
@@ -923,6 +927,8 @@ while(@record = $dbresponse->fetchrow_array) {
 	my $dbresponse = $dbhx->prepare($query2);
 	$dbresponse->execute(($hostname, $fingerprint));
 	$dbhx->disconnect();
+
+	# print gettimeofday() . ": Looked up $ip\n";
 
 	$pm->finish;
 }
