@@ -3,6 +3,9 @@
 // Copyright (c) 2006-2007, Joseph B. Kowalski
 // See LICENSE for licensing information 
 
+header('Location: notfound.php');
+die();
+
 require_once('common.php');
 
 $ip = $_GET['ip'];
