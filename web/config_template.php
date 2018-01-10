@@ -46,8 +46,14 @@ $GEOIP_Path = "geoip/";
 $GEOIP_Database_Path = "geoip/";
 $PHP_Path = "/usr/bin/";
 $TNS_Path = "/home/torstatus-kgprog-com/project/trunk/";
-// Comment the following line if you do not provide a WHOIS service
-define("WHOISPath","/whois.php?ip=");
+if(strpos($_SERVER['HTTP_HOST'], '.onion') === false)
+{
+	define("WHOISPath","https://www.whois.com/whois/");
+}
+else {
+	die('a');
+}
+die('b');
 
 // }}}
 
