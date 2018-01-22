@@ -921,22 +921,45 @@ while(@record = $dbresponse->fetchrow_array) {
 
 	my $pid = $pm->start and next DATA_LOOP;
 
-	$hostname = lookup($ip);
-	# If the hostname was not found, it should be an IP
-	unless ($hostname) {
-		$hostname = $ip;
-	}
-
-	$query2 = "UPDATE NetworkStatus${descriptorTable} SET Hostname = ? WHERE Fingerprint = ?";
-
-	print "Hostname: $hostname, fingerprint: $fingerprint, ip: $ip\n";
 	my $dbhx = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$config{'SQL_Server'},$config{'SQL_User'},$config{'SQL_Pass'}, {
 		PrintError => 0,
 		RaiseError => 1
 	}) or die "Unable to connect to MySQL server";
 
+	$host_query1 = 'SELECT hostname FROM hostnames WHERE ip = ?';
+	my $host_dbresponse1 = $dbhx->prepare($host_query1);
+	$host_dbresponse1->execute(($ip));
+	my @record_dbresponse1 = $host_dbresponse1->fetchrow_array;
+	my $cached = 0;
+	if(@record_dbresponse1) {
+		print "Cached entry found!\n";
+		$hostname = $record_dbresponse1[0];
+		$cached = 1;
+	}
+	else {
+		print "No cached entry found, executing lookup\n";
+		$hostname = lookup($ip);
+		# If the hostname was not found, it should be an IP
+		unless ($hostname) {
+			$hostname = $ip;
+		}
+	}
+	$host_dbresponse1->finish();
+
+	print "Hostname: $hostname, fingerprint: $fingerprint, ip: $ip\n";
+	$query2 = "UPDATE NetworkStatus${descriptorTable} SET Hostname = ? WHERE Fingerprint = ?";
+
 	my $dbresponse = $dbhx->prepare($query2);
 	$dbresponse->execute(($hostname, $fingerprint));
+	$dbresponse->finish();
+
+	if(!$cached) {
+		$host_query2 = 'INSERT INTO hostnames (ip, hostname) VALUES (?, ?)';
+		my $host_dbresponse2 = $dbhx->prepare($host_query2);
+		$host_dbresponse2->execute(($ip, $hostname));
+		$host_dbresponse2->finish();
+	}
+
 	$dbhx->disconnect();
 
 	# print gettimeofday() . ": Looked up $ip\n";
