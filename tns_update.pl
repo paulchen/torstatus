@@ -46,6 +46,7 @@ use File::Touch;
 use Time::HiRes qw(gettimeofday);
 use Parallel::ForkManager;
 use POSIX qw(strftime);
+use Cache::Memcached;
 
 print gettimeofday() . "\n";
 
@@ -93,6 +94,13 @@ while (1 == 1)
 
 # Find the initial time
 my $start_time = time();
+
+my $memcached = new Cache::Memcached {
+	'servers' => [ '127.0.0.1:11211' ],
+	'debug' => 0,
+	'compress_threshold' => 10_000
+};
+$memcached->enable_compress(0);
 
 # Initiate a connection to the MySQL server
 my $dbh = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$config{'SQL_Server'},$config{'SQL_User'},$config{'SQL_Pass'}, {
@@ -921,30 +929,41 @@ while(@record = $dbresponse->fetchrow_array) {
 
 ####	my $pid = $pm->start and next DATA_LOOP;
 
-	my $dbhx = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$config{'SQL_Server'},$config{'SQL_User'},$config{'SQL_Pass'}, {
-		PrintError => 0,
-		RaiseError => 1
-	}) or die "Unable to connect to MySQL server";
+####	my $dbhx = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$config{'SQL_Server'},$config{'SQL_User'},$config{'SQL_Pass'}, {
+####		PrintError => 0,
+####		RaiseError => 1
+####	}) or die "Unable to connect to MySQL server";
 
-	$host_query1 = 'SELECT hostname FROM hostnames WHERE ip = ?';
-	my $host_dbresponse1 = $dbhx->prepare($host_query1);
-	$host_dbresponse1->execute(($ip));
-	my @record_dbresponse1 = $host_dbresponse1->fetchrow_array;
+	my $dbhx = $dbh;
+
+	my $cache_key = "torstatus_host_$ip";
+	my $hostname = $memcached->get($cache_key);
 	my $cached = 0;
-	if(@record_dbresponse1) {
-		print gettimeofday() . " Cached entry found!\n";
-		$hostname = $record_dbresponse1[0];
+	if($hostname) {
+		print gettimeofday() . " Cached entry in memcache found!\n";
+	}
+	unless ($hostname) {
+		$host_query1 = 'SELECT hostname FROM hostnames WHERE ip = ?';
+		my $host_dbresponse1 = $dbhx->prepare($host_query1);
+		$host_dbresponse1->execute(($ip));
+		my @record_dbresponse1 = $host_dbresponse1->fetchrow_array;
+		if(@record_dbresponse1) {
+			print gettimeofday() . " Cached entry in database found!\n";
+			$hostname = $record_dbresponse1[0];
+		}
+		$host_dbresponse1->finish();
+	}
+	if($hostname) {
 		$cached = 1;
 	}
-	else {
+	unless ($hostname) {
 		print gettimeofday() . " No cached entry found, executing lookup\n";
 		$hostname = lookup($ip);
-		# If the hostname was not found, it should be an IP
-		unless ($hostname) {
-			$hostname = $ip;
-		}
 	}
-	$host_dbresponse1->finish();
+	# If the hostname was not found, it should be an IP
+	unless ($hostname) {
+		$hostname = $ip;
+	}
 
 	print gettimeofday() . " Hostname: $hostname, fingerprint: $fingerprint, ip: $ip\n";
 	$query2 = "UPDATE NetworkStatus${descriptorTable} SET Hostname = ? WHERE Fingerprint = ?";
@@ -961,7 +980,9 @@ while(@record = $dbresponse->fetchrow_array) {
 		$host_dbresponse2->finish();
 	}
 
-	$dbhx->disconnect();
+	$memcached->set($cache_key, $hostname);
+
+####	$dbhx->disconnect();
 
 	print gettimeofday() . ": Looked up $ip\n";
 
