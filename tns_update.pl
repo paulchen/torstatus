@@ -45,6 +45,7 @@ use Date::Parse;
 use File::Touch;
 use Time::HiRes qw(gettimeofday);
 use Parallel::ForkManager;
+use POSIX qw(strftime);
 
 print gettimeofday() . "\n";
 
@@ -161,6 +162,9 @@ my $torSocket = IO::Socket::INET->new(
 	Proto		=> "tcp",
 	Type		=> SOCK_STREAM)
 	or die "Could not connect to Tor server: $!\n";
+my $torLogfile;
+open $torLogfile, '>>', '/var/log/tns_update.log';
+print { $torLogfile } strftime("UPDATE STARTED: %Y-%m-%d %H:%M:%S", localtime) . "\n";
 
 # Prepare all of the database information, which Descriptor table, make sure
 # database is installed, etc
@@ -245,6 +249,8 @@ while (<$torSocket>)
 {
 	chop(my $line = $_);
 	chop($line);
+
+	print { $torLogfile } "$line\n";
 
 	my $router = 0;
 
@@ -338,6 +344,7 @@ while (<$torSocket>)
 		while ($current_line !~ /-----END RSA PUBLIC KEY-----/)
 		{
 			$current_line = <$torSocket>;
+			print { $torLogfile } "$current_line\n";
 			# print "z1: $current_line\n";
 			if($iteration == 0 && $current_line !~ /-----BEGIN RSA PUBLIC KEY-----/)
 			{
@@ -369,6 +376,7 @@ while (<$torSocket>)
 		while ($current_line !~ /-----END RSA PUBLIC KEY-----/)
 		{
 			$current_line = <$torSocket>;
+			print { $torLogfile } "$current_line\n";
 			# print "z2: $current_line\n";
 			if($iteration == 0 && $current_line !~ /-----BEGIN RSA PUBLIC KEY-----/)
 			{
@@ -490,6 +498,7 @@ while (<$torSocket>)
 		while ($current_line !~ /-----END SIGNATURE-----/)
 		{
 			$current_line = <$torSocket>;
+			print { $torLogfile } "$current_line\n";
 			# print "z3: $current_line\n";
 			$signature .= $current_line;
 		}
@@ -752,6 +761,8 @@ while (<$torSocket>)
 	chop($line);
 	# Trim the line so as to remove odd data
 
+	print { $torLogfile } "$line\n";
+
 #	print "y: $line\n";	
 	if ($line =~ /250 OK/) { last; } # Break when done
 
@@ -972,9 +983,12 @@ $dbh->do("UPDATE Status SET LastUpdate = now(), LastUpdateElapsed = ($end_time-$
 # Rename the DNSEL table so it is used
 $dbh->do("RENAME TABLE DNSEL TO tmp_table, DNSEL_INACT TO DNSEL, tmp_table TO DNSEL_INACT;");
 
+print { $torLogfile } strftime("UPDATE ENDED: %Y-%m-%d %H:%M:%S", localtime) . "\n";
+
 # Close both the database connection and the Tor server connection
 $dbh->disconnect();
 close($torSocket);
+close($torLogfile);
 
 # print "5\n";
 
