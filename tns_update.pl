@@ -904,7 +904,7 @@ my $dbh = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$co
 	RaiseError => 1
 }) or die "Unable to connect to MySQL server";
 
-my $pm = Parallel::ForkManager->new(20);
+####my $pm = Parallel::ForkManager->new(1);
 
 $query = "SELECT Fingerprint, IP FROM NetworkStatus${descriptorTable}";
 $dbresponse = $dbh->prepare($query);
@@ -919,7 +919,7 @@ while(@record = $dbresponse->fetchrow_array) {
 	$lookup_counter++;
 	print gettimeofday() . ": Looking up $ip ($lookup_counter/$router_count)\n";
 
-	my $pid = $pm->start and next DATA_LOOP;
+####	my $pid = $pm->start and next DATA_LOOP;
 
 	my $dbhx = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$config{'SQL_Server'},$config{'SQL_User'},$config{'SQL_Pass'}, {
 		PrintError => 0,
@@ -932,12 +932,12 @@ while(@record = $dbresponse->fetchrow_array) {
 	my @record_dbresponse1 = $host_dbresponse1->fetchrow_array;
 	my $cached = 0;
 	if(@record_dbresponse1) {
-		print "Cached entry found!\n";
+		print gettimeofday() . " Cached entry found!\n";
 		$hostname = $record_dbresponse1[0];
 		$cached = 1;
 	}
 	else {
-		print "No cached entry found, executing lookup\n";
+		print gettimeofday() . " No cached entry found, executing lookup\n";
 		$hostname = lookup($ip);
 		# If the hostname was not found, it should be an IP
 		unless ($hostname) {
@@ -946,13 +946,14 @@ while(@record = $dbresponse->fetchrow_array) {
 	}
 	$host_dbresponse1->finish();
 
-	print "Hostname: $hostname, fingerprint: $fingerprint, ip: $ip\n";
+	print gettimeofday() . " Hostname: $hostname, fingerprint: $fingerprint, ip: $ip\n";
 	$query2 = "UPDATE NetworkStatus${descriptorTable} SET Hostname = ? WHERE Fingerprint = ?";
 
 	my $dbresponse = $dbhx->prepare($query2);
 	$dbresponse->execute(($hostname, $fingerprint));
 	$dbresponse->finish();
 
+	print gettimeofday() . "\n";
 	if(!$cached) {
 		$host_query2 = 'INSERT INTO hostnames (ip, hostname) VALUES (?, ?)';
 		my $host_dbresponse2 = $dbhx->prepare($host_query2);
@@ -962,12 +963,12 @@ while(@record = $dbresponse->fetchrow_array) {
 
 	$dbhx->disconnect();
 
-	# print gettimeofday() . ": Looked up $ip\n";
+	print gettimeofday() . ": Looked up $ip\n";
 
-	$pm->finish;
+####	$pm->finish;
 }
 
-$pm->wait_all_children;
+#### $pm->wait_all_children;
 
 # exit;
 
