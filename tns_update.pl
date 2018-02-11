@@ -58,9 +58,6 @@ $SIG{ALRM} = sub {die "timeout"};
 my %CACHE;
 my %geoIPCache;
 
-# Counter for updating mirror list
-my $updateCounter = 0;
-
 # First the configuration file must be read
 # All of the variables will be inputed into a hash for ease of use
 my %config;
@@ -111,57 +108,6 @@ my $dbh = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$co
 my $query;
 my $dbresponse;
 my $record;
-
-# Determine whether or not the mirror list needs to be updated
-if ($updateCounter % 20 == 0)
-{
-	$updateCounter = 0;
-}
-if ($updateCounter == 0)
-{
-	my $changeanything = 1;
-	my $mirrorList;
-	my %mirrors;
-	# Determine whether the list needs to be downloaded
-	if ($config{'useMirrorList'} eq "1")
-	{
-		# Update the mirror list
-		my $newList = get($config{'mirrorListURI'});
-		if (!$newList)
-		{
-			$changeanything = 0;
-			$newList = serialize(["0"=>"0"]);
-		}
-		%mirrors = %{unserialize($newList)};
-	}
-	else
-	{
-		my $newList = $config{'manualMirrorList'};
-		$newList =~ s/array\((.*?)\)/$1/;
-		$newList = "%mirrors = (" . $newList . ");";
-		eval($newList);
-	}
-	# Parse the list
-	foreach my $k  (sort keys %mirrors)
-	{
-		my $v = $mirrors{$k};
-		unless ($k eq $config{'myMirrorName'})
-		{
-			$mirrorList .= '<a href="' . $v . '" class="plain">'.$k.'</a> | ';
-		}
-	}
-	chop($mirrorList);
-	chop($mirrorList);
-	chop($mirrorList);
-	if ($changeanything == 1)
-	{
-		# Update the mirror list in the database
-		$query = "UPDATE `Mirrors` SET `mirrors` = '$mirrorList' WHERE id=1;";
-		$dbresponse = $dbh->prepare($query);
-		$dbresponse->execute();
-	}
-}
-$updateCounter++;
 
 # Initiate a connection to the Tor server
 my $torSocket = IO::Socket::INET->new(
