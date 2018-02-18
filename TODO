@@ -1,0 +1,6 @@
+code cleanup
+broken: https://torstatus.rueckgr.at/column_set.php
+broken: https://torstatus.rueckgr.at/network_detail.php
+fix traffic history on router detail page
+get rid of dnsel stuff
+
