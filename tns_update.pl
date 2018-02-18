@@ -511,6 +511,7 @@ while (<$torSocket>)
 			
 			# Format for the read-history line
 			# "read-history" YYYY-MM-DD HH:MM:SS (NSEC s) NUM,NUM,NUM,NUM,NUM... NL
+			# TODO dirrec-read-history!
 			if ($dline =~ /read-history (.*?) (.*?) \((.*?) s\) (.*?)$/)
 			{
 				# Format for storing the data:
@@ -528,6 +529,7 @@ while (<$torSocket>)
 					push @readhistory, "$numtime:$num";
 					$offset -= $increment;
 				}
+				# TODO wtf?
 				$currentRouter{'read'} = join(';',@readhistory);
 			
 				# TEMPORARY FOR BACKWARDS COMPATIBILITY
@@ -540,6 +542,7 @@ while (<$torSocket>)
 		
 			# Format for the write-history line
 			# "write-history" YYYY-MM-DD HH:MM:SS (NSEC s) NUM,NUM,NUM,NUM,NUM... NL
+			# TODO dirrec-write-history!
 			if ($dline =~ /write-history (.*?) (.*?) \((.*?) s\) (.*?)$/)
 			{
 				# Format for storing the data:
@@ -557,6 +560,7 @@ while (<$torSocket>)
 					push @writehistory, "$numtime:$num";
 					$offset -= $increment;
 				}
+				# TODO wtf?
 				$currentRouter{'write'} = join(';',@writehistory);
 				
 				# TEMPORARY FOR BACKWARDS COMPATIBILITY
