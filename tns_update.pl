@@ -478,6 +478,8 @@ while (<$torSocket>)
 		# If there is a digest, extra information needs to be retrieved
 		# for this router
 		# A second Tor control stream will be opened
+		#
+		# TODO reuse connection
 		my $digestSocket = IO::Socket::INET->new(
 			PeerAddr 	=> $config{'LocalTorServerIP'},
 			PeerPort 	=> $config{'LocalTorServerControlPort'},
@@ -493,11 +495,16 @@ while (<$torSocket>)
 			die "Unable to authenticate with the Tor server.";
 		}
 		# And request the data
-		print $digestSocket "GETINFO extra-info/digest/" . $currentRouter{'Digest'} . "\r\n";
+		my $digest = ($currentRouter{'Digest'} =~ s/\s+.*$//r);
+
+		my $digestRequest = "GETINFO extra-info/digest/$digest\r\n";
+		print { $torLogfile } "DIGEST: $digestRequest";
+		print $digestSocket $digestRequest;
 
 		while (<$digestSocket>)
 		{
 			chop (my $dline = $_);
+			print { $torLogfile } "DIGEST: $dline\n";
 			chop($dline);
 			if ($dline =~ /^250 OK/) { last; } # Break when done
 			if ($dline =~ /^552 /) { last; } # Break on error
