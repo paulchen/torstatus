@@ -181,29 +181,6 @@ DEFINE("_JPG_DEBUG",false);
 DEFINE("_FORCE_IMGTOFILE",false);
 DEFINE("_FORCE_IMGDIR",'/tmp/jpgimg/');
 
-function CheckPHPVersion($aMinVersion)
-{
-    list($majorC, $minorC, $editC) = split('[/.-]', PHP_VERSION);
-    list($majorR, $minorR, $editR) = split('[/.-]', $aMinVersion);
-  
-    if ($majorC > $majorR) return true;
-    if ($majorC < $majorR) return false;
-    // same major - check ninor
-    if ($minorC > $minorR) return true;
-    if ($minorC < $minorR) return false;
-    // and same minor
-    if ($editC  >= $editR)  return true;
-    return true;
-}
-
-//
-// Make sure PHP version is high enough
-//
-if( !CheckPHPVersion(MIN_PHPVERSION) ) {
-    JpGraphError::RaiseL(13,PHP_VERSION,MIN_PHPVERSION);
-}
-
-
 //
 // Make GD sanity check
 //
@@ -5759,7 +5736,7 @@ class Image {
 
     // Get the specific height for a text string
     function GetTextHeight($txt="",$angle=0) {
-	$tmp = split("\n",$txt);
+	$tmp = explode("\n",$txt);
 	$n = count($tmp);
 	$m=0;
 	for($i=0; $i< $n; ++$i)
@@ -5804,7 +5781,7 @@ class Image {
     // Get actual width of text in absolute pixels
     function GetTextWidth($txt,$angle=0) {
 
-	$tmp = split("\n",$txt);
+	$tmp = explode("\n",$txt);
 	$n = count($tmp);
 	if( $this->font_family <= FF_FONT2+1 ) {
 
@@ -5955,8 +5932,8 @@ class Image {
 	    }
 	}
 	else {
-	    if( ereg("\n",$txt) ) { 
-		$tmp = split("\n",$txt);
+	    if( mb_strpos($txt, "\n") !== false ) { 
+		$tmp = explode("\n",$txt);
 		for($i=0; $i < count($tmp); ++$i) {
 		    $w1 = $this->GetTextWidth($tmp[$i]);
 		    if( $paragraph_align=="left" ) {
@@ -6163,7 +6140,7 @@ class Image {
 	    $w=$this->GetTextWidth($txt);
 
 	    $y -= $linemargin/2;
-	    $tmp = split("\n",$txt);
+	    $tmp = explode("\n",$txt);
 	    $nl = count($tmp);
 	    $h = $nl * $fh;
 
