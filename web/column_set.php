@@ -3,11 +3,7 @@
 // Copyright (c) 2006-2007, Joseph B. Kowalski
 // See LICENSE for licensing information 
 
-// Start new session
-session_start();
-
-// Include configuration settings
-include("config.php");
+require_once('common.php');
 
 // Declare and initialize variables
 $ColumnList_ACTIVE = null;
