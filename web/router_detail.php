@@ -53,6 +53,9 @@ if (strlen($Fingerprint) != 40)
 $query = "select $ActiveNetworkStatusTable.Name, $ActiveDescriptorTable.LastDescriptorPublished, $ActiveNetworkStatusTable.IP, $ActiveNetworkStatusTable.Hostname, $ActiveNetworkStatusTable.ORPort, $ActiveNetworkStatusTable.DirPort, $ActiveDescriptorTable.Platform, $ActiveDescriptorTable.Contact, CAST(((UNIX_TIMESTAMP() - (UNIX_TIMESTAMP($ActiveDescriptorTable.LastDescriptorPublished) + $OffsetFromGMT)) + $ActiveDescriptorTable.Uptime) AS SIGNED) as Uptime, $ActiveDescriptorTable.BandwidthMAX, $ActiveDescriptorTable.BandwidthBURST, $ActiveDescriptorTable.BandwidthOBSERVED, $ActiveDescriptorTable.OnionKey, $ActiveDescriptorTable.SigningKey, $ActiveDescriptorTable.WriteHistoryLAST, $ActiveDescriptorTable.WriteHistoryINC, $ActiveDescriptorTable.WriteHistorySERDATA, $ActiveDescriptorTable.ReadHistoryLAST, $ActiveDescriptorTable.ReadHistoryINC, $ActiveDescriptorTable.ReadHistorySERDATA, $ActiveDescriptorTable.ExitPolicySERDATA, $ActiveDescriptorTable.FamilySERDATA, $ActiveNetworkStatusTable.CountryCode, $ActiveDescriptorTable.Hibernating, $ActiveNetworkStatusTable.FAuthority, $ActiveNetworkStatusTable.FBadDirectory, $ActiveNetworkStatusTable.FBadExit, $ActiveNetworkStatusTable.FExit, $ActiveNetworkStatusTable.FFast, $ActiveNetworkStatusTable.FGuard, $ActiveNetworkStatusTable.FNamed, $ActiveNetworkStatusTable.FStable, $ActiveNetworkStatusTable.FRunning, $ActiveNetworkStatusTable.FValid, $ActiveNetworkStatusTable.FV2Dir from $ActiveNetworkStatusTable inner join $ActiveDescriptorTable on $ActiveNetworkStatusTable.Fingerprint = $ActiveDescriptorTable.Fingerprint where $ActiveNetworkStatusTable.Fingerprint = '$Fingerprint'";
 $record = db_query_single_row($query);
 
+#echo "<!-- \n";
+#print_r($record);
+#echo "\n -->";
 $Name = $record['Name'];
 $LastDescriptorPublished = $record['LastDescriptorPublished'];
 $IP = $record['IP'];
@@ -84,7 +87,7 @@ $FValid = $record['FValid'];
 $FV2Dir = $record['FV2Dir'];
 
 // Register necessary variables in session
-
+// TODO get rid of this
 if (!isset($_SESSION['WriteHistory_DATA_ARRAY_SERIALIZED'])) 
 {
 	$_SESSION['WriteHistory_DATA_ARRAY_SERIALIZED'] = $record['WriteHistorySERDATA'];
@@ -308,13 +311,15 @@ include("header.php");
 
 </tr>
 <tr>
-<?php // if(0): ?>
+<?php if(0): ?>
 <td class='HRN' colspan='2'>Bandwidth</td>
-<?php // endif; ?>
+<?php else: ?>
+<td class='HRN' colspan='2'></td>
+<?php endif; ?>
 <td class='HRN' style='border-left-color: #000072; border-left-style: solid; border-left-width: 1px;'>Router Flags</td>
 </tr>
 <tr>
-<?php // if(0): ?>
+<?php if(0): ?>
 <td class='TRS' style="text-align: center;">
 <?php if ($usePerlGraphs == 1) { ?>
 <img src="/cgi-bin/perlgraph/plot.pl?plottype=rtw" alt="Write History" /><br/>
@@ -329,7 +334,10 @@ include("header.php");
 <img src='bandwidth_history_graph.php?MODE=ReadHistory' />
 <?php } ?>
 </td>
-<?php // endif; ?>
+<?php else: ?>
+<td class='TRS' style="text-align: center;"></td>
+<td class='TRSB' style="text-align: center;"></td>
+<?php endif; ?>
 <td class='TRS' style='padding: 10px; border-left-color: #59990e; border-left-style: solid; border-left-width: 1px; vertical-align: top;'>
 <table cellspacing='0' cellpadding='0'>
 <?php
