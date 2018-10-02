@@ -5,7 +5,7 @@ RewriteRule ^index\.php/ - [R=404]
 #RewriteCond %{HTTP_USER_AGENT}		^.*nagios.*$
 #RewriteRule .*				index-nagios.html
 
-Options -Indexes
+Options -Indexes -MultiViews
 
 SetOutputFilter DEFLATE
 
