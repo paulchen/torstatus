@@ -677,35 +677,35 @@ function DisplayRouterRow()
 				echo " [".$record['IP']."]";
 				}
 			}
-			if ($record['Fast'] == 1)
+			if (isset($record['Fast']) && $record['Fast'] == 1)
 			{
 				echo "</td><td><div class='status_Fast' title='Fast Server'></div>";
 			}
-			if ($record['Valid'] == 0)
+			if (isset($record['Valid']) && $record['Valid'] == 0)
 			{
 				echo "</td><td><div class='status_Disputed' title='Not Listed By All Directory Servers'></div>";
 			}
-			if ($record['Exit'] == 1)
+			if (isset($record['Exit']) && $record['Exit'] == 1)
 			{
 				echo "</td><td><div class='status_Exit' title='Exit Server'></div>";
 			}
-			if ($record['V2Dir'] == 1)
+			if (isset($record['V2Dir']) && $record['V2Dir'] == 1)
 			{
 				echo "</td><td><div class='status_Dir' title='Directory Server'></div>";
 			}
-			if ($record['HSDir'] == 1)
+			if (isset($record['HSDir']) && $record['HSDir'] == 1)
 			{
 				echo "</td><td><div class='status_HSDir' title='HS Directory Server'></div>";
 			}
-			if ($record['Guard'] == 1)
+			if (isset($record['Guard']) && $record['Guard'] == 1)
 			{
 				echo "</td><td><div class='status_Guard' title='Guard Server'></div>";
 			}
-			if ($record['Stable'] == 1)
+			if (isset($record['Stable']) && $record['Stable'] == 1)
 			{
 				echo "</td><td><div class='status_Stable' title='Stable Server'></div>";
 			}
-			if ($record['Authority'] == 1)
+			if (isset($record['Authority']) && $record['Authority'] == 1)
 			{
 				echo "</td><td><div class='status_Authority' title='Authority Server'></div>";
 			}
