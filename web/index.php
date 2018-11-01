@@ -589,11 +589,11 @@ function DisplayRouterRow()
 	}
 	else
 	{
-	if ($record['Running'] == 0 && $record['Hibernating'] == 0)
+	if (isset($record['Running']) && isset($record['Hibernating']) && $record['Running'] == 0 && $record['Hibernating'] == 0)
 	{
 		echo "<tr class='d'>";
 	}
-	else if ($record['Running'] == 0 && $record['Hibernating'] == 1)
+	else if (isset($record['Running']) && isset($record['Hibernating']) && $record['Running'] == 0 && $record['Hibernating'] == 1)
 	{
 		echo "<tr class='R'>";
 	}
@@ -603,7 +603,7 @@ function DisplayRouterRow()
 	}
 	}
 
-	if ($record['Named'] == 1)
+	if (isset($record['Named']) && $record['Named'] == 1)
 	{
 		echo "<td class='TRR'>";
 	}
