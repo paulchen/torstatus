@@ -2197,9 +2197,6 @@ fetch_mirrors();
 </div>
 <div class="separator"></div>
 <div class="mirrorbar">
-<table width="100%"><tr><td>
-Known mirrors: <b><?php echo $myMirrorName; ?></b> | <?php echo $mirrorList; ?>
-</td><td>
 <div style="width: 100%; text-align: right;" id="expandcollapse">
 <script type="text/javascript">
 <!--
