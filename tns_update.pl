@@ -47,6 +47,7 @@ use Time::HiRes qw(gettimeofday);
 use Parallel::ForkManager;
 use POSIX qw(strftime);
 use Cache::Memcached;
+use IO::Handle;
 
 print gettimeofday() . "\n";
 
@@ -118,6 +119,7 @@ my $torSocket = IO::Socket::INET->new(
 	or die "Could not connect to Tor server: $!\n";
 my $torLogfile;
 open $torLogfile, '>>', '/var/log/tns_update.log';
+$torLogfile->autoflush;
 print { $torLogfile } strftime("UPDATE STARTED: %Y-%m-%d %H:%M:%S", localtime) . "\n";
 
 # Prepare all of the database information, which Descriptor table, make sure
