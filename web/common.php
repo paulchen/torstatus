@@ -6,6 +6,12 @@ function die_503($text) {
 	die();
 }
 
+function die_400() {
+	header('HTTP/1.1 400 Bad Request');
+	header('Status: 400 Bad Request');
+	die();
+}
+
 function db_query_single_row($query) {
 	global $mysqli;
 
@@ -29,7 +35,7 @@ function fetch_mirrors() {
 }
 
 // Start new session
-session_start();
+@session_start() or die_400();
 
 // Include configuration settings
 require_once("config.php");

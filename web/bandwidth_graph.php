@@ -4,7 +4,7 @@
 // See LICENSE for licensing information 
 
 // Start new session
-session_start();
+@session_start() or die();
 
 // Include configuration settings
 include("config.php");
