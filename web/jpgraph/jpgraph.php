@@ -7557,6 +7557,9 @@ class Plot {
 //---------------
 // CONSTRUCTOR
     function Plot($aDatay,$aDatax=false) {
+	if(!is_array($aDatay)) {
+	    return;
+	}
 	$this->numpoints = count($aDatay);
 	if( $this->numpoints==0 )
 	    JpGraphError::RaiseL(25121);//("Empty input data array specified for plot. Must have at least one data point.");
