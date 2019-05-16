@@ -24,13 +24,28 @@ if (isset($_SESSION["CCExitGraph_DATA_ARRAY_SERIALIZED"]))
 {
 	$DATA_ARRAY = unserialize($_SESSION['CCExitGraph_DATA_ARRAY_SERIALIZED']);
 }
+else
+{
+	http_response_code(400);
+	die();
+}
 if (isset($_SESSION["CCExitGraph_LABEL_ARRAY_SERIALIZED"]))
 {
 	$LABEL_ARRAY = unserialize($_SESSION['CCExitGraph_LABEL_ARRAY_SERIALIZED']);
 }
+else
+{
+	http_response_code(400);
+	die();
+}
 if (isset($_SESSION["CCExitGraph_Title"]))
 {
 	$Title = $_SESSION['CCExitGraph_Title'];
+}
+else
+{
+	http_response_code(400);
+	die();
 }
 if (isset($_SESSION["CCExitGraph_Legend"]))
 {

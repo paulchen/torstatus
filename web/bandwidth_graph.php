@@ -24,13 +24,28 @@ if (isset($_SESSION["BWGraph_DATA_ARRAY_SERIALIZED"]))
 {
 	$DATA_ARRAY = unserialize($_SESSION['BWGraph_DATA_ARRAY_SERIALIZED']);
 }
+else
+{
+	http_response_code(400);
+	die();
+}
 if (isset($_SESSION["BWGraph_LABEL_ARRAY_SERIALIZED"]))
 {
 	$LABEL_ARRAY = unserialize($_SESSION['BWGraph_LABEL_ARRAY_SERIALIZED']);
 }
+else
+{
+	http_response_code(400);
+	die();
+}
 if (isset($_SESSION["BWGraph_Title"]))
 {
 	$Title = $_SESSION['BWGraph_Title'];
+}
+else
+{
+	http_response_code(400);
+	die();
 }
 if (isset($_SESSION["BWGraph_Legend"]))
 {
