@@ -566,7 +566,7 @@ include("header.php");
 </td>
 </tr>
 <tr>
-<td class='HRN' colspan='2'>Number of Routers Mathcing Specified Criteria</td>
+<td class='HRN' colspan='2'>Number of Routers Matching Specified Criteria</td>
 </tr>
 
 <tr>
