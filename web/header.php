@@ -27,6 +27,9 @@ fetch_mirrors();
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<?php if(isset($noindex) && $noindex): ?>
+	<meta name="robots" content="noindex" />
+<?php endif; ?>
 	<title>TorStatus - <?php echo $pageTitle; ?></title>
 	<link rel="stylesheet" type="text/css" href="css/main.css" />
 	<!--[if lt IE 7.]>

@@ -146,6 +146,8 @@ else
 	$_SESSION['ReadHistory_LAST'] = $record['ReadHistoryLAST'];
 }
 
+$noindex = true;
+
 // Handle no descriptor available situation
 if ($Name == null)
 {
