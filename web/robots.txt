@@ -1,3 +1,2 @@
 User-agent: *
-Disallow: /whois.php
 Disallow: /router_detail.php
