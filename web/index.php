@@ -42,7 +42,7 @@ if ($DetermineUsingSSL == 1)
 }
 
 $Self = $_SERVER['PHP_SELF'];
-$Host = $_SERVER['HTTP_HOST'];
+$Host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
 $forwardedFor = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
 $xff = array_map( 'trim', explode( ',',$forwardedFor ) );
 $xff = array_reverse( $xff );
