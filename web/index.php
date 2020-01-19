@@ -582,7 +582,7 @@ function GenerateHeaderRow()
 
 function DisplayRouterRow()
 {
-	global $CurrentResultSet, $record, $ColumnList_ACTIVE, $country_codes, $notified_missing_countries, $notified_missing_flags;
+	global $CurrentResultSet, $record, $ColumnList_ACTIVE, $country_codes, $notified_missing_countries, $notified_missing_flags, $mysqli;
 	if (isset($record['BadExit']) && $record['BadExit'])
 	{
 		echo "<tr class='B'>";
@@ -647,7 +647,9 @@ function DisplayRouterRow()
 		}
 	}
 
-	if ($countrycode == "") { $countrycode = "nna"; $record['CountryCode'] = "NNA"; }
+	if ($countrycode == "" || !isset($country_codes[strtolower($record['CountryCode'])])) {
+		$countrycode = "nna"; $record['CountryCode'] = "NNA";
+	}
 	echo "<div class='flags_$countrycode' title='".$country_codes[strtolower($record['CountryCode'])]."'></div>&nbsp;";
 #	echo "<img src='img/flags/".$countrycode.".gif' class='flag' width='18px' alt='".$record['CountryCode']."' title='".$country_codes[strtolower($record['CountryCode'])]."'/>&nbsp;";
 	echo "<a href='router_detail.php?FP=" . $record['Fingerprint'] . "'>" . $record['Name'] . "</a></td>";
