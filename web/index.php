@@ -103,6 +103,7 @@ $country_codes = array (
 "am" => "Armenia",
 "an" => "Netherlands Antilles",
 "ao" => "Angola",
+"ap" => "Asia/Pacific Region",
 "aq" => "Antarctica",
 "ar" => "Argentina",
 "as" => "American Samoa",
