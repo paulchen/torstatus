@@ -66,9 +66,9 @@ $hour = date('G', $timestamp);
 $minute = date('i', $timestamp);
 $second = date('s', $timestamp);
 $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $mysqli->escape_string($_SERVER['HTTP_USER_AGENT']) : '';
-$request_uri = $mysqli->escape_string($_SERVER['REQUEST_URI']);
+$request_uri = isset($_SERVER['REQUEST_URI']) ? $mysqli->escape_string($_SERVER['REQUEST_URI']) : '';
 $session_id = $mysqli->escape_string(session_id());
-$ip = $mysqli->escape_string($_SERVER['REMOTE_ADDR']);
+$ip = isset($_SERVER['REMOTE_ADDR']) ? $mysqli->escape_string($_SERVER['REMOTE_ADDR']) : '';
 
 #$query = "INSERT INTO access_log (`timestamp`, year, month, day, hour, minute, second, user_agent, request_uri, session_id, ip) VALUES (FROM_UNIXTIME($timestamp), '$year', '$month', '$day', '$hour', '$minute', '$second', '$user_agent', '$request_uri', '$session_id', '$ip')";
 #$mysqli->query($query);
