@@ -857,7 +857,7 @@ function DisplayRouterRow()
 			if ($record[$value] > -1 && $record[$value] < 5*24)
 			{
 				echo "<td class='TDc'>";
-				if ($record['Running'] == 0 && $record['Hibernating'] == 0)
+				if ((!isset($record['Running']) || $record['Running'] == 0) && (!isset($record['Hibernating']) || $record['Hibernating'] == 0))
 				{
 					echo "<img src='/img/routerdown.png' alt=' router is down' title='Router is currently down'/>";
 				}
@@ -872,7 +872,7 @@ function DisplayRouterRow()
 			else if ($record[$value] >= 5*24)
 			{
 				echo "<td class='TDcb'>";
-				if ($record['Running'] == 0 && $record['Hibernating'] == 0)
+				if ((!isset($record['Running']) || $record['Running'] == 0) && (!isset($record['Hibernating']) || $record['Hibernating'] == 0))
 				{
 					echo "<img src='/img/routerdown.png' alt=' router is down' title='Router is currently down'/>";
 				}
