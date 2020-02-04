@@ -957,6 +957,9 @@ my $dbh = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$co
 	RaiseError => 1
 }) or die "Unable to connect to MySQL server";
 
+$dbh->do("UPDATE Descriptor${descriptorTable} SET LastDescriptorPublished = NOW() WHERE LastDescriptorPublished > NOW()");
+$dbh->do("UPDATE NetworkStatus${descriptorTable} SET LastDescriptorPublished = NOW() WHERE LastDescriptorPublished > NOW()");
+
 # Update the opinion source
 # We need to find out who we are
 print $torSocket "GETCONF nickname \r\n";
