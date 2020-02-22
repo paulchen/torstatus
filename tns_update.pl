@@ -901,17 +901,17 @@ while(@record = $dbresponse->fetchrow_array) {
 	if($hostname) {
 		print gettimeofday() . " Cached entry in memcache found!\n";
 	}
-	unless ($hostname) {
-		$host_query1 = 'SELECT hostname FROM hostnames WHERE ip = ?';
-		my $host_dbresponse1 = $dbhx->prepare($host_query1);
-		$host_dbresponse1->execute(($ip));
-		my @record_dbresponse1 = $host_dbresponse1->fetchrow_array;
-		if(@record_dbresponse1) {
-			print gettimeofday() . " Cached entry in database found!\n";
-			$hostname = $record_dbresponse1[0];
-		}
-		$host_dbresponse1->finish();
-	}
+#	unless ($hostname) {
+#	$host_query1 = 'SELECT hostname FROM hostnames WHERE ip = ?';
+#		my $host_dbresponse1 = $dbhx->prepare($host_query1);
+#		$host_dbresponse1->execute(($ip));
+#	my @record_dbresponse1 = $host_dbresponse1->fetchrow_array;
+#	if(@record_dbresponse1) {
+#		print gettimeofday() . " Cached entry in database found!\n";
+#		$hostname = $record_dbresponse1[0];
+#	}
+#	$host_dbresponse1->finish();
+#	}
 	if($hostname) {
 		$cached = 1;
 	}
@@ -932,14 +932,14 @@ while(@record = $dbresponse->fetchrow_array) {
 	$dbresponse->finish();
 
 	print gettimeofday() . "\n";
-	if(!$cached) {
-		$host_query2 = 'INSERT INTO hostnames (ip, hostname) VALUES (?, ?)';
-		my $host_dbresponse2 = $dbhx->prepare($host_query2);
-		$host_dbresponse2->execute(($ip, $hostname));
-		$host_dbresponse2->finish();
-	}
+#	if(!$cached) {
+#		$host_query2 = 'INSERT INTO hostnames (ip, hostname) VALUES (?, ?)';
+#		my $host_dbresponse2 = $dbhx->prepare($host_query2);
+#		$host_dbresponse2->execute(($ip, $hostname));
+#		$host_dbresponse2->finish();
+#}
 
-	$memcached->set($cache_key, $hostname);
+	$memcached->set($cache_key, $hostname, 86400);
 
 ####	$dbhx->disconnect();
 
