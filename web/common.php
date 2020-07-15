@@ -50,13 +50,14 @@ if($mysqli->connect_error) {
 }
 
 // Get last update and active table information from database
-$query = "select LastUpdate, LastUpdateElapsed, ActiveNetworkStatusTable, ActiveDescriptorTable from Status";
+$query = "select LastUpdate, LastUpdateElapsed, ActiveNetworkStatusTable, ActiveDescriptorTable, ActiveORAddressesTable from Status";
 $record = db_query_single_row($query);
 
 $LastUpdate = $record['LastUpdate'];
 $LastUpdateElapsed = $record['LastUpdateElapsed'];
 $ActiveNetworkStatusTable = $record['ActiveNetworkStatusTable'];
 $ActiveDescriptorTable = $record['ActiveDescriptorTable'];
+$ActiveORAddressesTable = $record['ActiveORAddressesTable'];
 
 $timestamp = time();
 $year = date('Y', $timestamp);

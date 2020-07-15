@@ -1486,11 +1486,27 @@ if ($RemoteIPDBCount > 0)
 {
 	$PositiveMatch_IP = 1;	
 }
+else {
+	$query = "select count(*) as Count from $ActiveORAddressesTable where address = '$RemoteIP'";
+	$record = db_query_single_row($query);
+
+	$RemoteIPDBCount = $record['Count'];
+
+	if ($RemoteIPDBCount > 0)
+	{
+		$PositiveMatch_IP = 1;	
+	}
+}
 
 // Get name, fingerprint, and exit policy of Tor node(s) if match was found, look for match in ExitPolicy
 if ($PositiveMatch_IP == 1)
 {
-	$query = "select $ActiveNetworkStatusTable.Name, $ActiveNetworkStatusTable.Fingerprint, $ActiveDescriptorTable.ExitPolicySERDATA from $ActiveNetworkStatusTable inner join $ActiveDescriptorTable on $ActiveNetworkStatusTable.Fingerprint = $ActiveDescriptorTable.Fingerprint where $ActiveNetworkStatusTable.IP = '$RemoteIP'";
+	$query = "select $ActiveNetworkStatusTable.Name Name, $ActiveNetworkStatusTable.Fingerprint Fingerprint, $ActiveDescriptorTable.ExitPolicySERDATA ExitPolicySERDATA
+		from $ActiveNetworkStatusTable
+			inner join $ActiveDescriptorTable on $ActiveNetworkStatusTable.Fingerprint = $ActiveDescriptorTable.Fingerprint
+			left join $ActiveORAddressesTable on $ActiveDescriptorTable.ID = $ActiveORAddressesTable.descriptor_id
+		where ($ActiveNetworkStatusTable.IP = '$RemoteIP' or $ActiveORAddressesTable.address = '$RemoteIP')
+		group by Name, Fingerprint, ExitPolicySERDATA";
 	$result = $mysqli->query($query);
 	if(!$result) {
 		die_503('Query failed: ' . $mysqli->error);
@@ -2274,11 +2290,11 @@ else if ($PositiveMatch_IP == 1)
 		echo "Server name: <a class='tab' href='router_detail.php?FP=$TorNodeFP[$i]'>$TorNodeName[$i]</a><br/>";
 		if ($PositiveMatch_ExitPolicy[$i] == 1)
 		{
-			//echo "<span class='usingTor'>-This Tor server would allow exiting to this page-</span>";
+			echo "<span class='usingTor'>This Tor server would allow exiting to this page</span><br />";
 		}
 		else if ($PositiveMatch_ExitPolicy[$i] == 0)
 		{
-			echo "<span class='notUsingTor'>-This Tor server would NOT allow exiting to this page-</span>";
+			echo "<span class='notUsingTor'>This Tor server would NOT allow exiting to this page</span><br />";
 		}
 	}
 	echo '</td></tr>';
@@ -2287,34 +2303,24 @@ else
 {
 	echo "<tr><td class='tab'>";
 	echo "<img alt='You are not using Tor' src='/img/notusingtor.png'/>";
-	echo "</td><td class='content'>";
+	echo "</td><td class='content' style='text-align: center;'>";
 	echo "<span class='notUsingTor'>You do not appear to be using Tor</span><br/>Your IP Address is: $RemoteIP";
 	echo "</td></tr>";
 }
 
-/*
 if($Hidden_Service_URL != null)
 {
 	echo "<tr>\n";
-	echo "<td class='TRC'></td><td><b>";
-	echo "<font color='#3344ee'>This site is available as a Tor Hidden Service at:</font><br/><a class='plain' href='$Hidden_Service_URL'>$Hidden_Service_URL</a><br/><br/>";
-	echo "</b></td>\n";
+	echo "<td colspan='2' style='border-top: solid 1px black; text-align: center;'><br />";
+	echo "<font color='#3344ee'>This site is available as a Tor Hidden Service at:</font><br/><a style='text-decoration: underline; color: #3344ee;' href='$Hidden_Service_URL'>$Hidden_Service_URL</a><br/><br/>";
+	echo "</td>\n";
 	echo "</tr>\n";
 }
- */
 ?>
 
 </table>
 
 </div></div></div>
-
-<div style="text-align: center; width: 100%;"><a href="http://jlve2y45zacpbz6s.onion" style="text-decoration: underline; color: blue;">Access via hidden service</a></div>
-<!-- <div style="text-align: center; width: 100%;"><a href="stats" style="text-decoration: underline; color: blue;">Access statistics for tor.rueckgr.at by country/city</a></div> -->
-<div style="text-align: center; width: 100%;">
-<!-- <a href="onionoo" style="text-decoration: underline; color: blue;">Onionoo</a> -->
-<!-- <a href="atlas" style="text-decoration: underline; color: blue;">Atlas</a> -->
-<!-- <a href="compass" style="text-decoration: underline; color: blue;">Compass</a> -->
-</div>
 
 <table cellspacing="2" cellpadding="2" class="body">
 
