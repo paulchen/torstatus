@@ -48,6 +48,7 @@ use Parallel::ForkManager;
 use POSIX qw(strftime);
 use Cache::Memcached;
 use IO::Handle;
+use Data::Dumper;
 
 print gettimeofday() . "\n";
 
@@ -166,6 +167,7 @@ if ($response !~ /250/)
 # modified as well as the DNSEL table
 $dbh->do("TRUNCATE TABLE Bandwidth${descriptorTable};");
 $dbh->do("TRUNCATE TABLE Descriptor${descriptorTable};");
+$dbh->do("TRUNCATE TABLE ORAddresses${descriptorTable};");
 $dbh->do("TRUNCATE TABLE DNSEL_INACT;");
 
 # Prepare the updating query
@@ -178,6 +180,9 @@ my $dbresponse4 = $dbh->prepare($query4);
 # Prepare the DNSEL update
 $query = "INSERT INTO DNSEL_INACT (IP,ExitPolicy) VALUES ( ? , ? );";
 my $dbresponse2 = $dbh->prepare($query);
+
+$query5 = "INSERT INTO ORAddresses${descriptorTable} (descriptor_id, address, port) VALUES (?, ?, ?)";
+my $dbresponse5 = $dbh->prepare($query5);
 
 # Now all of the recent descriptors data needs to be retrieved
 my @descAll;
@@ -243,8 +248,7 @@ while (<$torSocket>)
 			$or_address = $1;
 		}
 
-		my %or_data = ('ip' => $currentRouter{'address'}, 'port' => $currentRouter{'ORPort'}, 'or_address' => $or_address, 'or_port' => $or_port);
-		push(@or_addresses, %or_data);
+		push(@or_addresses, {'address' => $or_address, 'port' => $or_port});
 	}
 
 	# Format for the bandwidth line
@@ -619,14 +623,23 @@ while (<$torSocket>)
 		 $currentRouter{'DescriptorSignature'}
 		);
 
+		$router_id = $dbresponse->{mysql_insertid};
+
 		# Save to the DNSEL table as well
 		$dbresponse2->execute($currentRouter{'address'},$exitpolicystring);
 
 		# Update the read and write bandwidth history
 		$dbresponse4->execute($currentRouter{'Fingerprint'}, $currentRouter{'read'}, $currentRouter{'write'});
 
+#		print Dumper(\@or_addresses);
+		foreach my $item (@or_addresses)
+		{
+			$dbresponse5->execute($router_id, $item->{'address'}, $item->{'port'});
+		}
+
 		# Clear the old data
 		%currentRouter = ();
+		@or_addresses = ();
 	}
 #	print "a...\n";
 }
@@ -843,7 +856,7 @@ $dbh->do("UPDATE NetworkStatusSource SET ID=1;");
 my $end_time = time();
 
 # Set the status to use the new data
-$dbh->do("UPDATE Status SET LastUpdate = now(), LastUpdateElapsed = ($end_time-$start_time), ActiveNetworkStatusTable = 'NetworkStatus${descriptorTable}', ActiveDescriptorTable = 'Descriptor${descriptorTable}' WHERE ID = 1;");
+$dbh->do("UPDATE Status SET LastUpdate = now(), LastUpdateElapsed = ($end_time-$start_time), ActiveNetworkStatusTable = 'NetworkStatus${descriptorTable}', ActiveDescriptorTable = 'Descriptor${descriptorTable}', ActiveORAddressesTable = 'ORAddresses${descriptorTable}' WHERE ID = 1;");
 
 # Rename the DNSEL table so it is used
 $dbh->do("RENAME TABLE DNSEL TO tmp_table, DNSEL_INACT TO DNSEL, tmp_table TO DNSEL_INACT;");

@@ -320,7 +320,34 @@ CREATE TABLE `Status` (
   `LastUpdateElapsed` int(10) UNSIGNED DEFAULT NULL,
   `ActiveNetworkStatusTable` varchar(256) DEFAULT NULL,
   `ActiveDescriptorTable` varchar(256) DEFAULT NULL,
-  `ActiveDNSELTable` varchar(256) DEFAULT NULL
+  `ActiveDNSELTable` varchar(256) DEFAULT NULL,
+  `ActiveORAddressesTable` varchar(256) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `ORAddresses1`
+--
+
+CREATE TABLE `ORAddresses1` (
+  `id` int(11) NOT NULL,
+  `descriptor_id` int(11) NOT NULL,
+  `address` varchar(100) NOT NULL,
+  `port` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `ORAddresses2`
+--
+
+CREATE TABLE `ORAddresses2` (
+  `id` int(11) NOT NULL,
+  `descriptor_id` int(11) NOT NULL,
+  `address` varchar(100) NOT NULL,
+  `port` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -456,6 +483,30 @@ ALTER TABLE `Status`
   ADD PRIMARY KEY (`ID`);
 
 --
+-- Tabellenstruktur für Tabelle `ORAddresses1`
+--
+
+CREATE TABLE `ORAddresses1` (
+  `id` int(11) NOT NULL,
+  `descriptor_id` int(11) NOT NULL,
+  `address` varchar(100) NOT NULL,
+  `port` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `ORAddresses2`
+--
+
+CREATE TABLE `ORAddresses2` (
+  `id` int(11) NOT NULL,
+  `descriptor_id` int(11) NOT NULL,
+  `address` varchar(100) NOT NULL,
+  `port` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
 -- AUTO_INCREMENT für exportierte Tabellen
 --
 
@@ -530,6 +581,19 @@ ALTER TABLE `NetworkStatus1`
 --
 ALTER TABLE `NetworkStatus2`
   MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT für Tabelle `ORAddresses1`
+--
+ALTER TABLE `ORAddresses1`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT für Tabelle `ORAddresses2`
+--
+ALTER TABLE `ORAddresses2`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
