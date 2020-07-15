@@ -354,6 +354,8 @@ $country_codes = array (
 
 );
 
+require_once(dirname(__FILE__) . '/../lib/iputils/IpUtils.php');
+
 // Function Declarations
 function IsIPInSubnet($IP,$Subnet)
 {
@@ -364,52 +366,22 @@ function IsIPInSubnet($IP,$Subnet)
 	/* always return true if subnet is wildcard */
 	if ($Subnet == '*')
 	{
-		return 1;
+		return true;
 	}
 
 	/* always return true if ip is an exact match as is */
 	if ($Subnet == $IP)
 	{
-		return 1;
+		return false;
 	}
 
 	/* always return false if only an ip was provided, and it's not an exact match */
 	if (strpos($Subnet, '/') === FALSE)
 	{
-		return 0;
+		return false;
 	}
 
-       /* get the base and the bits from the subnet */
-       list($base, $bits) = explode('/', $Subnet);
-
-       /* now split it up into it's classes */
-       list($a, $b, $c, $d) = explode('.', $base);
-
-       /* now do some bit shifting/switching to convert to ints */
-       $i = ($a << 24) + ($b << 16) + ($c << 8) + $d;
-       $mask = $bits == 0 ? 0 : (~0 << (32 - $bits));
-
-       /* here's our lowest int */
-       $low = $i & $mask;
-
-       /* here's our highest int */
-       $high = $i | (~$mask & 0xFFFFFFFF);
-
-       /* now split the ip we're checking against up into classes */
-       list($a, $b, $c, $d) = explode('.', $IP);
-
-       /* now convert the ip we're checking against to an int */
-       $check = ($a << 24) + ($b << 16) + ($c << 8) + $d;
-
-       /* if the ip is within the range, including highest/lowest values, then it's within the subnet range */
-       if ($check >= $low && $check <= $high)
-	{
-		return 1;
-	}
-       else
-	{
-		return 0;
-	}
+	return IpUtils::checkIp($IP, $Subnet);
 }
 
 function GenerateHeaderRow()
@@ -1531,11 +1503,14 @@ if ($PositiveMatch_IP == 1)
 
 			// Seperate parts of ExitPolicy line
 			list($Condition,$NetworkLine) = explode(' ', rtrim($ExitPolicyLine));
-			list($Subnet,$PortLine) = explode(':', $NetworkLine);
+			$matches = array();
+			preg_match('/(.*):([^:]*)$/', $NetworkLine, $matches);
+			$Subnet = trim($matches[1], '[]');
+			$PortLine = $matches[2];
 			$Port = explode(',', $PortLine);
 
 			// Find out if IP client used to access this server is a match for the subnet specified on this ExitPolicy line
-			if (IsIPInSubnet($ServerIP,$Subnet) == 1)
+			if (IsIPInSubnet($ServerIP,$Subnet))
 			{
 				// Determine if port is also a match
 				foreach($Port as $CurrentPortExpression)
@@ -1543,12 +1518,12 @@ if ($PositiveMatch_IP == 1)
 					// Handle condition where port is a '*' character (Port always matches)
 					if ($CurrentPortExpression == '*')
 					{
-						if ($Condition == 'accept')
+						if ($Condition == 'accept' || $Condition == 'accept6')
 						{
 							$PositiveMatch_ExitPolicy[$Count] = 1;
 							break 2;
 						}
-						else if ($Condition == 'reject')
+						else if ($Condition == 'reject' || $Condition == 'reject6')
 						{
 							$PositiveMatch_ExitPolicy[$Count] = 0;
 							break 2;
@@ -2277,13 +2252,13 @@ Good job, you do not have JavaScript enabled!
 
 if(!(false === strpos($Hidden_Service_URL, $Host)))
 {
-	echo '<tr><td class="tab"><img src="/img/usingtor.png" alt="You are using Tor" /></td><td class="content">';
+	echo '<tr><td class="tab"><img src="/img/usingtor.png" alt="You are using Tor" /></td><td class="content" style="text-align: center">';
 	echo '<span class="usingTor">You appear to be accessing this server through the Tor network as a hidden service.</span>';
 	echo '</td></tr>';
 }
 else if ($PositiveMatch_IP == 1)
 {
-	echo '<tr><td class="tab"><img src="/img/usingtor.png" alt="You are using Tor" /></td><td class="content">';
+	echo '<tr><td class="tab"><img src="/img/usingtor.png" alt="You are using Tor" /></td><td class="content" style="text-align: center">';
 	echo "<span class='usingTor'>It appears that you are using the Tor network</span><br/>Your OR is: $RemoteIP<br/>";
 	for($i=1 ; $i < ($Count + 1) ; $i++)
 	{

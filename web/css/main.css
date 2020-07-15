@@ -652,7 +652,7 @@ div.content
 
 .dropcontainer
 {
-	width: 400px;
+	width: 600px;
 	margin-left: auto;
 	margin-right: auto;
 }
@@ -661,7 +661,7 @@ div.content
 	background: url(/img/shadow.gif) no-repeat bottom right;
 	margin: 10px 0 10px 10px !important;
 	margin: 10px 0 10px 5px;
-	width: 400px;
+	width: 600px;
 	padding: 0px;
 }
 .innerbox{
@@ -681,7 +681,7 @@ table.torcheck
 	margin: 0px;
 	padding: 0px;
 	background: white;
-	width: 400px;
+	width: 600px;
 	height: 65px;
 }
 td.tab
