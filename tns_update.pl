@@ -86,10 +86,6 @@ while (<$config_handle>)
 }
 close ($config_handle);
 
-# Loop through until killed
-while (1 == 1)
-{
-
 # Find the initial time
 my $start_time = time();
 
@@ -103,7 +99,8 @@ $memcached->enable_compress(0);
 # Initiate a connection to the MySQL server
 my $dbh = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$config{'SQL_Server'},$config{'SQL_User'},$config{'SQL_Pass'}, {
 	PrintError => 0,
-	RaiseError => 1
+	RaiseError => 1,
+	AutoCommit => 0
 }) or die "Unable to connect to MySQL server";
 
 my $query;
@@ -172,22 +169,15 @@ $dbh->do("TRUNCATE TABLE Descriptor${descriptorTable};");
 $dbh->do("TRUNCATE TABLE DNSEL_INACT;");
 
 # Prepare the updating query
-$query1 = "INSERT INTO Descriptor${descriptorTable} (Name, IP, ORPort, DirPort, Platform, LastDescriptorPublished, Fingerprint, Uptime, BandwidthMAX, BandwidthBURST, BandwidthOBSERVED, OnionKey, SigningKey, Hibernating, Contact, WriteHistoryLAST, WriteHistoryINC, WriteHistorySERDATA, ReadHistoryLAST, ReadHistoryINC, ReadHistorySERDATA, FamilySERDATA, ExitPolicySERDATA, DescriptorSignature) VALUES ";
-my @query1_parts = ();
-my @query1_params = ();
-# $dbresponse = $dbh->prepare($query);
+$query1 = "INSERT INTO Descriptor${descriptorTable} (Name, IP, ORPort, DirPort, Platform, LastDescriptorPublished, Fingerprint, Uptime, BandwidthMAX, BandwidthBURST, BandwidthOBSERVED, OnionKey, SigningKey, Hibernating, Contact, WriteHistoryLAST, WriteHistoryINC, WriteHistorySERDATA, ReadHistoryLAST, ReadHistoryINC, ReadHistorySERDATA, FamilySERDATA, ExitPolicySERDATA, DescriptorSignature) VALUES ( ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? )";
+$dbresponse = $dbh->prepare($query1);
 
-$query2 = 'INSERT INTO DNSEL_INACT (IP,ExitPolicy) VALUES ';
-my @query2_parts = ();
-my @query2_params = ();
-
-$query4 = "INSERT INTO Bandwidth${descriptorTable} (fingerprint, `read`, `write`) VALUES ";
-my @query4_parts = ();
-my @query4_params = ();
+$query4 = "INSERT INTO Bandwidth${descriptorTable} (fingerprint, `read`, `write`) VALUES (?, ?, ?)";
+my $dbresponse4 = $dbh->prepare($query4);
 
 # Prepare the DNSEL update
-#$query = "INSERT INTO DNSEL_INACT (IP,ExitPolicy) VALUES ( ? , ? );";
-#my $dbresponse2 = $dbh->prepare($query);
+$query = "INSERT INTO DNSEL_INACT (IP,ExitPolicy) VALUES ( ? , ? );";
+my $dbresponse2 = $dbh->prepare($query);
 
 # Now all of the recent descriptors data needs to be retrieved
 my @descAll;
@@ -200,6 +190,7 @@ my %currentRouter;
 
 my $router_count = 0;
 
+my @or_addresses = ();
 # print "3\n";
 while (<$torSocket>)
 {
@@ -240,6 +231,20 @@ while (<$torSocket>)
 		$currentRouter{'Hibernating'} = 0;
 
 		$router = 1;
+	}
+
+	if ($line =~ /^or-address (.*):(.*)$/)
+	{
+		$or_address = $1;
+		$or_port = $2;
+
+		if($or_address =~ /^\[(.*)\]$/)
+		{
+			$or_address = $1;
+		}
+
+		my %or_data = ('ip' => $currentRouter{'address'}, 'port' => $currentRouter{'ORPort'}, 'or_address' => $or_address, 'or_port' => $or_port);
+		push(@or_addresses, %or_data);
 	}
 
 	# Format for the bandwidth line
@@ -358,6 +363,7 @@ while (<$torSocket>)
 	if ($line =~ /contact (.*?)$/)
 	{
 		$currentRouter{'Contact'} = $1;
+		print(length($1) . "\n");
 	}
 
 	# Format for the extra-info-digest line
@@ -587,79 +593,38 @@ while (<$torSocket>)
 		}
 
 		# Save the data to the MySQL database
-		my @fields = ('nickname', 'address', 'ORPort', 'DirPort', 'Platform', 'LastDescriptorPublished', 'Fingerprint', 'Uptime', 'BandwidthMAX', 'BandwidthBURST', 'BandwidthOBSERVED', 'OnionKey', 'SigningKey', 'Hibernating', 'Contact', 'WriteHistoryLAST', 'WriteHistoryINC', 'WriteHistorySERDATA', 'ReadHistoryLAST', 'ReadHistoryINC', 'ReadHistorySERDATA', 'FamilySERDATA', 'ExitPolicySERDATA', 'DescriptorSignature');
-		foreach(@fields) {
-			push(@query1_params, $currentRouter{$_});
-		}
-		push(@query1_parts, '( ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? )');
-
-#		if(scalar(@query_parts) > 10) {
-#			last;
-#		}	
-#		$dbresponse->execute( $currentRouter{'nickname'},
-#		 $currentRouter{'address'},
-#		 $currentRouter{'ORPort'},
-#		 $currentRouter{'DirPort'},
-#		 $currentRouter{'Platform'},
-#		 $currentRouter{'LastDescriptorPublished'},
-#		 $currentRouter{'Fingerprint'},
-#		 $currentRouter{'Uptime'},
-#		 $currentRouter{'BandwidthMAX'},
-#		 $currentRouter{'BandwidthBURST'},
-#		 $currentRouter{'BandwidthOBSERVED'},
-#		 $currentRouter{'OnionKey'},
-#		 $currentRouter{'SigningKey'},
-#		 $currentRouter{'Hibernating'},
-#		 $currentRouter{'Contact'},
-#		 $currentRouter{'WriteHistoryLAST'},
-#		 $currentRouter{'WriteHistoryINC'},
-#		 $currentRouter{'WriteHistorySERDATA'},
-#		 $currentRouter{'ReadHistoryLAST'},
-#		 $currentRouter{'ReadHistoryINC'},
-#		 $currentRouter{'ReadHistorySERDATA'},
-#		 $currentRouter{'FamilySERDATA'},
-#		 $currentRouter{'ExitPolicySERDATA'},
-#		 $currentRouter{'DescriptorSignature'}
-#		);
-
-		push(@query4_params, $currentRouter{'Fingerprint'});
-		push(@query4_params, $currentRouter{'read'});
-		push(@query4_params, $currentRouter{'write'});
-		push(@query4_parts, "(?, ?, ?)");
-		# Update the read and write bandwidth history
-#		updateBandwidth( $currentRouter{'Fingerprint'},
-#			$currentRouter{'write'},
-#			$currentRouter{'read'},
-#			$dbh);
+		$dbresponse->execute( $currentRouter{'nickname'},
+		 $currentRouter{'address'},
+		 $currentRouter{'ORPort'},
+		 $currentRouter{'DirPort'},
+		 $currentRouter{'Platform'},
+		 $currentRouter{'LastDescriptorPublished'},
+		 $currentRouter{'Fingerprint'},
+		 $currentRouter{'Uptime'},
+		 $currentRouter{'BandwidthMAX'},
+		 $currentRouter{'BandwidthBURST'},
+		 $currentRouter{'BandwidthOBSERVED'},
+		 $currentRouter{'OnionKey'},
+		 $currentRouter{'SigningKey'},
+		 $currentRouter{'Hibernating'},
+		 $currentRouter{'Contact'},
+		 $currentRouter{'WriteHistoryLAST'},
+		 $currentRouter{'WriteHistoryINC'},
+		 $currentRouter{'WriteHistorySERDATA'},
+		 $currentRouter{'ReadHistoryLAST'},
+		 $currentRouter{'ReadHistoryINC'},
+		 $currentRouter{'ReadHistorySERDATA'},
+		 $currentRouter{'FamilySERDATA'},
+		 $currentRouter{'ExitPolicySERDATA'},
+		 $currentRouter{'DescriptorSignature'}
+		);
 
 		# Save to the DNSEL table as well
-#		$dbresponse2->execute($currentRouter{'address'},$exitpolicystring);
-		push(@query2_params, $currentRouter{'address'});
-		push(@query2_params, $exitpolicystring);
-		push(@query2_parts, '(?, ?)');
+		$dbresponse2->execute($currentRouter{'address'},$exitpolicystring);
 
-		if(scalar(@query1_parts) > 1000) {
-			my $query1x = $query1 . join(', ', @query1_parts);
-#				print "$query1x\n";
-			$dbresponse = $dbh->prepare($query1x);
-			$dbresponse->execute(@query1_params);
-			@query1_params = ();
-			@query1_parts = ();
+		# Update the read and write bandwidth history
+		$dbresponse4->execute($currentRouter{'Fingerprint'}, $currentRouter{'read'}, $currentRouter{'write'});
 
-			my $query2x = $query2 . join(', ', @query2_parts);
-#				print "$query2x\n";
-			$dbresponse = $dbh->prepare($query2x);
-			$dbresponse->execute(@query2_params);
-			@query2_params = ();
-			@query2_parts = ();
-
-			my $query4x = $query4 . join(', ', @query4_parts);
-#				print "$query4x\n";
-			$dbresponse = $dbh->prepare($query4x);
-			$dbresponse->execute(@query4_params);
-			@query4_params = ();
-			@query4_parts = ();
-		}
 		# Clear the old data
 		%currentRouter = ();
 	}
@@ -669,30 +634,6 @@ while (<$torSocket>)
 #print "y...\n";
 
 print "Number of routers: $router_count\n";
-
-if(scalar(@query1_parts) > 0) {
-	$query1 .= join(', ', @query1_parts);
-	# print "$query1\n";
-	$dbresponse = $dbh->prepare($query1);
-	$dbresponse->execute(@query1_params) or print "failed query: $query1\n";
-	if($dbh->errstr) {
-		print "failed query: $query1";
-	}
-}
-
-if(scalar(@query2_parts) > 0) {
-	$query2 .= join(', ', @query2_parts);
-	# print "$query2\n";
-	$dbresponse = $dbh->prepare($query2);
-	$dbresponse->execute(@query2_params);
-}
-
-if(scalar(@query4_parts) > 0) {
-	$query4 .= join(', ', @query4_parts);
-	# print "$query4\n";
-	$dbresponse = $dbh->prepare($query4);
-	$dbresponse->execute(@query4_params);
-}
 
 # print("3\n");
 
@@ -715,8 +656,8 @@ my @query3_parts = ();
 my @query3_params = ();
 
 # Prepare the query so that data entry is faster
-#$query = "INSERT INTO NetworkStatus${descriptorTable} (Name,Fingerprint,DescriptorHash,LastDescriptorPublished,IP,Hostname,ORPort,DirPort,FAuthority,FBadDirectory,FBadExit,FExit,FFast,FGuard,FNamed,FStable,FRunning,FValid,FV2Dir,FHSDir,CountryCode) VALUES ( ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ?);";
-#$dhresponse = $dbh->prepare($query);
+$query = "INSERT INTO NetworkStatus${descriptorTable} (Name,Fingerprint,DescriptorHash,LastDescriptorPublished,IP,Hostname,ORPort,DirPort,FAuthority,FBadDirectory,FBadExit,FExit,FFast,FGuard,FNamed,FStable,FRunning,FValid,FV2Dir,FHSDir,CountryCode) VALUES ( ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ?);";
+$dhresponse = $dbh->prepare($query);
 
 #print "4\n";
 #
@@ -750,60 +691,29 @@ while (<$torSocket>)
 		print "A: " . gettimeofday() . "\n";
 		if ($currentRouter{'Nickname'})
 		{
-			push(@query3_parts, '( ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ?)');
-			push(@query3_params, $currentRouter{'Nickname'});
-			push(@query3_params, $currentRouter{'Identity'});
-			push(@query3_params, $currentRouter{'Digest'});
-			push(@query3_params, $currentRouter{'Publication'});
-			push(@query3_params, $currentRouter{'IP'});
-			push(@query3_params, $currentRouter{'Hostname'});
-			push(@query3_params, $currentRouter{'ORPort'});
-			push(@query3_params, $currentRouter{'DirPort'});
-			push(@query3_params, ($currentRouter{'Authority'}?1:0));
-			push(@query3_params, ($currentRouter{'BadDirectory'}?1:0));
-			push(@query3_params, ($currentRouter{'BadExit'}?1:0));
-			push(@query3_params, ($currentRouter{'Exit'}?1:0));
-			push(@query3_params, ($currentRouter{'Fast'}?1:0));
-			push(@query3_params, ($currentRouter{'Guard'}?1:0));
-			push(@query3_params, ($currentRouter{'Named'}?1:0));
-			push(@query3_params, ($currentRouter{'Stable'}?1:0));
-			push(@query3_params, ($currentRouter{'Running'}?1:0));
-			push(@query3_params, ($currentRouter{'Valid'}?1:0));
-			push(@query3_params, ($currentRouter{'V2Dir'}?1:0));
-			push(@query3_params, ($currentRouter{'HSDir'}?1:0));
-			push(@query3_params, $currentRouter{'Country'});
-
-			if(scalar(@query3_parts) > 1000) {
-				my $query3x = $query3 . join(', ', @query3_parts);
-#				print "$query3x\n";
-				$dbresponse = $dbh->prepare($query3x);
-				$dbresponse->execute(@query3_params);
-				@query3_params = ();
-				@query3_parts = ();
-			}
-#			$dhresponse->execute(
-#			 $currentRouter{'Nickname'},
-#			 $currentRouter{'Identity'},
-#			 $currentRouter{'Digest'},
-#			 $currentRouter{'Publication'},
-#			 $currentRouter{'IP'},
-#			 $currentRouter{'Hostname'},
-#			 $currentRouter{'ORPort'},
-#			 $currentRouter{'DirPort'},
-#			 ($currentRouter{'Authority'}?1:0),
-#			 ($currentRouter{'BadDirectory'}?1:0),
-#			 ($currentRouter{'BadExit'}?1:0),
-#			 ($currentRouter{'Exit'}?1:0),
-#			 ($currentRouter{'Fast'}?1:0),
-#			 ($currentRouter{'Guard'}?1:0),
-#			 ($currentRouter{'Named'}?1:0),
-#			 ($currentRouter{'Stable'}?1:0),
-#			 ($currentRouter{'Running'}?1:0),
-#			 ($currentRouter{'Valid'}?1:0),
-#			 ($currentRouter{'V2Dir'}?1:0),
-#			 ($currentRouter{'HSDir'}?1:0),
-#			 $currentRouter{'Country'}
-#			);
+			$dhresponse->execute(
+			 $currentRouter{'Nickname'},
+			 $currentRouter{'Identity'},
+			 $currentRouter{'Digest'},
+			 $currentRouter{'Publication'},
+			 $currentRouter{'IP'},
+			 $currentRouter{'Hostname'},
+			 $currentRouter{'ORPort'},
+			 $currentRouter{'DirPort'},
+			 ($currentRouter{'Authority'}?1:0),
+			 ($currentRouter{'BadDirectory'}?1:0),
+			 ($currentRouter{'BadExit'}?1:0),
+			 ($currentRouter{'Exit'}?1:0),
+			 ($currentRouter{'Fast'}?1:0),
+			 ($currentRouter{'Guard'}?1:0),
+			 ($currentRouter{'Named'}?1:0),
+			 ($currentRouter{'Stable'}?1:0),
+			 ($currentRouter{'Running'}?1:0),
+			 ($currentRouter{'Valid'}?1:0),
+			 ($currentRouter{'V2Dir'}?1:0),
+			 ($currentRouter{'HSDir'}?1:0),
+			 $currentRouter{'Country'}
+			);
 		
 			# Clear the old data
 			%currentRouter = ();
@@ -858,21 +768,6 @@ while (<$torSocket>)
 	print gettimeofday() . "\n";
 }
 
-if(scalar(@query3_parts) > 0) {
-	my $query3x = $query3 . join(', ', @query3_parts);
-	#print "$query3x\n";
-	$dbresponse = $dbh->prepare($query3x) or print "failed query: $query3x\n";
-	$dbresponse->execute(@query3_params) or print "failed query: $query3x\n";
-}
-$dbh->disconnect();
-
-my $dbh = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$config{'SQL_Server'},$config{'SQL_User'},$config{'SQL_Pass'}, {
-	PrintError => 0,
-	RaiseError => 1
-}) or die "Unable to connect to MySQL server";
-
-####my $pm = Parallel::ForkManager->new(1);
-
 $query = "SELECT Fingerprint, IP FROM NetworkStatus${descriptorTable}";
 $dbresponse = $dbh->prepare($query);
 $dbresponse->execute();
@@ -886,32 +781,12 @@ while(@record = $dbresponse->fetchrow_array) {
 	$lookup_counter++;
 	print gettimeofday() . ": Looking up $ip ($lookup_counter/$router_count)\n";
 
-####	my $pid = $pm->start and next DATA_LOOP;
-
-####	my $dbhx = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$config{'SQL_Server'},$config{'SQL_User'},$config{'SQL_Pass'}, {
-####		PrintError => 0,
-####		RaiseError => 1
-####	}) or die "Unable to connect to MySQL server";
-
-	my $dbhx = $dbh;
-
 	my $cache_key = "torstatus_host_$ip";
 	my $hostname = $memcached->get($cache_key);
 	my $cached = 0;
 	if($hostname) {
 		print gettimeofday() . " Cached entry in memcache found!\n";
 	}
-#	unless ($hostname) {
-#	$host_query1 = 'SELECT hostname FROM hostnames WHERE ip = ?';
-#		my $host_dbresponse1 = $dbhx->prepare($host_query1);
-#		$host_dbresponse1->execute(($ip));
-#	my @record_dbresponse1 = $host_dbresponse1->fetchrow_array;
-#	if(@record_dbresponse1) {
-#		print gettimeofday() . " Cached entry in database found!\n";
-#		$hostname = $record_dbresponse1[0];
-#	}
-#	$host_dbresponse1->finish();
-#	}
 	if($hostname) {
 		$cached = 1;
 	}
@@ -927,35 +802,18 @@ while(@record = $dbresponse->fetchrow_array) {
 	print gettimeofday() . " Hostname: $hostname, fingerprint: $fingerprint, ip: $ip\n";
 	$query2 = "UPDATE NetworkStatus${descriptorTable} SET Hostname = ? WHERE Fingerprint = ?";
 
-	my $dbresponse = $dbhx->prepare($query2);
+	my $dbresponse = $dbh->prepare($query2);
 	$dbresponse->execute(($hostname, $fingerprint));
 	$dbresponse->finish();
 
 	print gettimeofday() . "\n";
-#	if(!$cached) {
-#		$host_query2 = 'INSERT INTO hostnames (ip, hostname) VALUES (?, ?)';
-#		my $host_dbresponse2 = $dbhx->prepare($host_query2);
-#		$host_dbresponse2->execute(($ip, $hostname));
-#		$host_dbresponse2->finish();
-#}
 
 	$memcached->set($cache_key, $hostname, 86400);
 
-####	$dbhx->disconnect();
-
 	print gettimeofday() . ": Looked up $ip\n";
-
-####	$pm->finish;
 }
 
-#### $pm->wait_all_children;
-
 # exit;
-
-my $dbh = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$config{'SQL_Server'},$config{'SQL_User'},$config{'SQL_Pass'}, {
-	PrintError => 0,
-	RaiseError => 1
-}) or die "Unable to connect to MySQL server";
 
 $dbh->do("UPDATE Descriptor${descriptorTable} SET LastDescriptorPublished = NOW() WHERE LastDescriptorPublished > NOW()");
 $dbh->do("UPDATE NetworkStatus${descriptorTable} SET LastDescriptorPublished = NOW() WHERE LastDescriptorPublished > NOW()");
@@ -993,6 +851,7 @@ $dbh->do("RENAME TABLE DNSEL TO tmp_table, DNSEL_INACT TO DNSEL, tmp_table TO DN
 print { $torLogfile } strftime("UPDATE ENDED: %Y-%m-%d %H:%M:%S", localtime) . "\n";
 
 # Close both the database connection and the Tor server connection
+$dbh->commit();
 $dbh->disconnect();
 close($torSocket);
 close($torLogfile);
@@ -1000,12 +859,10 @@ close($torLogfile);
 # print "5\n";
 
 # Sleep for the desired time from the configuration file
-#sleep($config{'Cache_Expire_Time'});
 # print "6\n";
 my @file_list = ('/var/www/TorNetworkStatus/last_update');
 touch(@file_list);
-exit 0
-}
+exit 0;
 
 ############ Subroutines #####################################################
 
@@ -1025,10 +882,3 @@ END
     return $CACHE{$ip} || $ip;
 }
 
-# This updates the bandwidth table for a given router
-#sub updateBandwidth {
-#	my ($fingerprint, $write, $read, $dbh) = @_;
-#	my $dbresponse3 = $dbh->prepare("SELECT `read`, `write` FROM `Bandwidth` WHERE `fingerprint` LIKE '$fingerprint'\;");
-#	$dbresponse3->execute();
-#	my @results = $dbresponse3->fetchrow();
-#}
