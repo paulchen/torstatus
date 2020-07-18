@@ -2250,10 +2250,10 @@ Good job, you do not have JavaScript enabled!
 
 <?php
 
-if(!(false === strpos($Hidden_Service_URL, $Host)))
+if(preg_match('/^[0-9a-z]*\.onion$/', $Host))
 {
 	echo '<tr><td class="tab"><img src="/img/usingtor.png" alt="You are using Tor" /></td><td class="content" style="text-align: center">';
-	echo '<span class="usingTor">You appear to be accessing this server through the Tor network as a hidden service.</span>';
+	echo '<span class="usingTor">You appear to be accessing this server through the Tor network as an Onion service.</span>';
 	echo '</td></tr>';
 }
 else if ($PositiveMatch_IP == 1)
@@ -2287,7 +2287,8 @@ if($Hidden_Service_URL != null)
 {
 	echo "<tr>\n";
 	echo "<td colspan='2' style='border-top: solid 1px black; text-align: center;'><br />";
-	echo "<font color='#3344ee'>This site is available as a Tor Hidden Service at:</font><br/><a style='text-decoration: underline; color: #3344ee;' href='$Hidden_Service_URL'>$Hidden_Service_URL</a><br/><br/>";
+	echo "<font color='#3344ee'>This site is available as a Tor Onion Service at:</font><br/><a style='text-decoration: underline; color: #3344ee;' href='$Hidden_Service_URL'>$Hidden_Service_URL</a><br/><br/>";
+	echo "<span style='color: red; font-weight: bold;'>NEW:</span> <span style='color: #3344ee'>Onion V3 Service now available at:</span><br /><a style='text-decoration: underline; color: #3344ee;' href='http://t3qi4hdmvqo752lhyglhyb5ysoutggsdocmkxhuojfn62ntpcyydwmqd.onion/'>http://t3qi4hdmvqo752lhyglhyb5ysoutggsdocmkxhuojfn62ntpcyydwmqd.onion/</a><br/><br/>";
 	echo "</td>\n";
 	echo "</tr>\n";
 }
