@@ -477,34 +477,26 @@ ALTER TABLE `NetworkStatusSource`
   ADD PRIMARY KEY (`ID`);
 
 --
+-- Indizes für die Tabelle `ORAddresses1`
+--
+ALTER TABLE `ORAddresses1`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `address` (`address`),
+  ADD KEY `descriptor_id` (`descriptor_id`);
+
+--
+-- Indizes für die Tabelle `ORAddresses2`
+--
+ALTER TABLE `ORAddresses1`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `address` (`address`),
+  ADD KEY `descriptor_id` (`descriptor_id`);
+
+--
 -- Indizes für die Tabelle `Status`
 --
 ALTER TABLE `Status`
   ADD PRIMARY KEY (`ID`);
-
---
--- Tabellenstruktur für Tabelle `ORAddresses1`
---
-
-CREATE TABLE `ORAddresses1` (
-  `id` int(11) NOT NULL,
-  `descriptor_id` int(11) NOT NULL,
-  `address` varchar(100) NOT NULL,
-  `port` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `ORAddresses2`
---
-
-CREATE TABLE `ORAddresses2` (
-  `id` int(11) NOT NULL,
-  `descriptor_id` int(11) NOT NULL,
-  `address` varchar(100) NOT NULL,
-  `port` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- AUTO_INCREMENT für exportierte Tabellen
