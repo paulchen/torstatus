@@ -2287,8 +2287,8 @@ if($Hidden_Service_URL != null)
 {
 	echo "<tr>\n";
 	echo "<td colspan='2' style='border-top: solid 1px black; text-align: center;'><br />";
-	echo "<font color='#3344ee'>This site is available as a Tor Onion Service at:</font><br/><a style='text-decoration: underline; color: #3344ee;' href='$Hidden_Service_URL'>$Hidden_Service_URL</a><br/><br/>";
-	echo "<span style='color: red; font-weight: bold;'>NEW:</span> <span style='color: #3344ee'>Onion V3 Service now available at:</span><br /><a style='text-decoration: underline; color: #3344ee;' href='http://t3qi4hdmvqo752lhyglhyb5ysoutggsdocmkxhuojfn62ntpcyydwmqd.onion/'>http://t3qi4hdmvqo752lhyglhyb5ysoutggsdocmkxhuojfn62ntpcyydwmqd.onion/</a><br/><br/>";
+	echo "<font color='#3344ee'>This site is available as an Onion V3 Service at:</font><br/><a style='text-decoration: underline; color: #3344ee;' href='$Hidden_Service_URL'>$Hidden_Service_URL</a><br/><br/>";
+	echo "<span style='color: #3344ee'>Deprecated Onion V2 Service still available at:</span><br /><a style='text-decoration: underline; color: #3344ee;' href='http://jlve2y45zacpbz6s.onion/'>http://jlve2y45zacpbz6s.onion/</a><br/><br/>";
 	echo "</td>\n";
 	echo "</tr>\n";
 }
