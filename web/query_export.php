@@ -952,7 +952,7 @@ else
 // die($query);
 $result = $mysqli->query($query);
 if(!$result) {
-	die_503('Query failed: ' . $mysql->error);
+	die_503('Query failed: ' . $mysqli->error);
 }
 
 // Generate header row
