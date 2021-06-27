@@ -1,6 +1,7 @@
 <?php
 
 function die_503($text) {
+	error_log("HTTP 503 returned to client; reason: $text");
 	header('HTTP/1.1 503 Service Temporarily Unavailable');
 	header('Status: 503 Service Temporarily Unavailable');
 	die();
