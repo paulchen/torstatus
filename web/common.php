@@ -72,6 +72,9 @@ $request_uri = isset($_SERVER['REQUEST_URI']) ? $mysqli->escape_string($_SERVER[
 $session_id = $mysqli->escape_string(session_id());
 $ip = isset($_SERVER['REMOTE_ADDR']) ? $mysqli->escape_string($_SERVER['REMOTE_ADDR']) : '';
 
+$memcached = new Memcached();
+$memcached->addServer('127.0.0.1', 11211);
+
 #$query = "INSERT INTO access_log (`timestamp`, year, month, day, hour, minute, second, user_agent, request_uri, session_id, ip) VALUES (FROM_UNIXTIME($timestamp), '$year', '$month', '$day', '$hour', '$minute', '$second', '$user_agent', '$request_uri', '$session_id', '$ip')";
 #$mysqli->query($query);
 
