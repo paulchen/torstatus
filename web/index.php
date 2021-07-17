@@ -1422,13 +1422,13 @@ else
 
 // Get total number of routers from database
 $query = "select count(*) as Count from $ActiveNetworkStatusTable";
-$record = db_query_single_row($query);
+$record = db_query_single_row($query, 1800);
 
 $RouterCount = $record['Count'];
 
 // Get details on Network Status Source router from the database
 $query = "select Name, IP, ORPort, DirPort, Fingerprint, Platform, LastDescriptorPublished, OnionKey, SigningKey, Contact, DescriptorSignature from NetworkStatusSource where ID = 1";
-$record = db_query_single_row($query);
+$record = db_query_single_row($query, 1800);
 
 $Name = $record['Name'];
 $IP = $record['IP'];
@@ -1443,14 +1443,14 @@ $Contact = $record['Contact'];
 $DescriptorSignature = $record['DescriptorSignature'];
 
 $query = "select Hostname, CountryCode from $ActiveNetworkStatusTable where Fingerprint = '$Fingerprint'";
-$record = db_query_single_row($query);
+$record = db_query_single_row($query, 1800);
 
 $Hostname = $record['Hostname'];
 $CountryCode = $record['CountryCode'];
 
 // Determine if client IP exists in database as a Tor server
 $query = "select count(*) as Count from $ActiveNetworkStatusTable where IP = '$RemoteIP'";
-$record = db_query_single_row($query);
+$record = db_query_single_row($query, 1800);
 
 $RemoteIPDBCount = $record['Count'];
 
@@ -1460,7 +1460,7 @@ if ($RemoteIPDBCount > 0)
 }
 else {
 	$query = "select count(*) as Count from $ActiveORAddressesTable where address = '$RemoteIP'";
-	$record = db_query_single_row($query);
+	$record = db_query_single_row($query, 1800);
 
 	$RemoteIPDBCount = $record['Count'];
 
@@ -1583,7 +1583,7 @@ if ($PositiveMatch_IP == 1)
 
 // Get descriptor count
 $query = "select count(*) as Count from $ActiveDescriptorTable";
-$record = db_query_single_row($query);
+$record = db_query_single_row($query, 1800);
 
 $DescriptorCount = $record['Count'];
 
@@ -2380,7 +2380,7 @@ $query = "select
 	(select count(*) from $ActiveNetworkStatusTable where FHSDir = '1') as 'HSDir',
 	(select count(*) from $ActiveNetworkStatusTable where DirPort > 0) as 'DirMirror'";
 
-$record = db_query_single_row($query);
+$record = db_query_single_row($query, 1800);
 
 // Display total number of routers
 if ($RouterCount != 0)

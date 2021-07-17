@@ -13,15 +13,26 @@ function die_400() {
 	die();
 }
 
-function db_query_single_row($query) {
-	global $mysqli;
+function db_query_single_row($query, $cache_expiration = -1) {
+	global $mysqli, $memcached;
 
-	$result = $mysqli->query($query);
-	if(!$result) {
-		die_503('Query failed: ' . $mysqli->error);
+	$record = false;
+	if($cache_expiration > -1) {
+		$cache_key = "torstatus_query_" . sha1($query);
+		$record = unserialize($memcached->get($cache_key));
 	}
-	$record = $result->fetch_assoc();
-	$result->free();
+	if(!$record) {
+		$result = $mysqli->query($query);
+		if(!$result) {
+			die_503('Query failed: ' . $mysqli->error);
+		}
+		$record = $result->fetch_assoc();
+		$result->free();
+
+		if($cache_expiration > -1) {
+			$memcached->set($cache_key, serialize($record), $cache_expiration);
+		}
+	}
 
 	return $record;
 }
@@ -31,7 +42,7 @@ function fetch_mirrors() {
 
 	// Retrieve the mirror list from the database
 	$query = "SELECT mirrors FROM `Mirrors` WHERE id=1";
-	$mirrorListRow = db_query_single_row($query);
+	$mirrorListRow = db_query_single_row($query, 86400);
 	$mirrorList = $mirrorListRow['mirrors'];
 }
 
@@ -40,6 +51,9 @@ function fetch_mirrors() {
 
 // Include configuration settings
 require_once("config.php");
+
+$memcached = new Memcached();
+$memcached->addServer('127.0.0.1', 11211);
 
 // Get script start time
 $TimeStart = microtime(true);
@@ -52,7 +66,7 @@ if($mysqli->connect_error) {
 
 // Get last update and active table information from database
 $query = "select LastUpdate, LastUpdateElapsed, ActiveNetworkStatusTable, ActiveDescriptorTable, ActiveORAddressesTable from Status";
-$record = db_query_single_row($query);
+$record = db_query_single_row($query, 60);
 
 $LastUpdate = $record['LastUpdate'];
 $LastUpdateElapsed = $record['LastUpdateElapsed'];
@@ -71,9 +85,6 @@ $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $mysqli->escape_string($_SERV
 $request_uri = isset($_SERVER['REQUEST_URI']) ? $mysqli->escape_string($_SERVER['REQUEST_URI']) : '';
 $session_id = $mysqli->escape_string(session_id());
 $ip = isset($_SERVER['REMOTE_ADDR']) ? $mysqli->escape_string($_SERVER['REMOTE_ADDR']) : '';
-
-$memcached = new Memcached();
-$memcached->addServer('127.0.0.1', 11211);
 
 #$query = "INSERT INTO access_log (`timestamp`, year, month, day, hour, minute, second, user_agent, request_uri, session_id, ip) VALUES (FROM_UNIXTIME($timestamp), '$year', '$month', '$day', '$hour', '$minute', '$second', '$user_agent', '$request_uri', '$session_id', '$ip')";
 #$mysqli->query($query);
