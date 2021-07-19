@@ -16,12 +16,16 @@ function die_400() {
 function db_query_single_row($query, $cache_expiration = -1) {
 	global $mysqli, $memcached;
 
-	$record = false;
+	$query_database = true;
 	if($cache_expiration > -1) {
 		$cache_key = "torstatus_query_" . sha1($query);
-		$record = unserialize($memcached->get($cache_key));
+		$cache_data = unserialize($memcached->get($cache_key));
+		if($cache_data) {
+			$query_database = false;
+			$record = $cache_data['content'];
+		}
 	}
-	if(!$record) {
+	if($query_database) {
 		$result = $mysqli->query($query);
 		if(!$result) {
 			die_503('Query failed: ' . $mysqli->error);
@@ -30,7 +34,8 @@ function db_query_single_row($query, $cache_expiration = -1) {
 		$result->free();
 
 		if($cache_expiration > -1) {
-			$memcached->set($cache_key, serialize($record), $cache_expiration);
+			$cache_data = array('content' => $record);
+			$memcached->set($cache_key, serialize($cache_data), $cache_expiration);
 		}
 	}
 
