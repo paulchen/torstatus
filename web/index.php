@@ -2204,7 +2204,6 @@ Good job, you do not have JavaScript enabled!
 </td></tr></table>
 </div>
 <div class="infobar" id="infobar">
-<?php if($DNSEL_Domain != null){echo '<a class="plain" href="dnsel_server.php">DNSEL Server</a> |';} ?>
 <a class="plain" href="tor_exit_query.php">Tor Exit Node Query</a> |
 <a class='plain' href='#AppServer' onclick='javascript:asdToggle = 0;toggleASD();'>TorStatus Server Details</a> |
 <a class='plain' href='#TorServer' onclick='javascript:nsosToggle = 0;toggleNSOS();'>Opinion Source</a> |

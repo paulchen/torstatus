@@ -164,11 +164,10 @@ if ($response !~ /250/)
 ############ Updating router descriptions ####################################
 
 # Delete all of the records from the descriptor table that is going to be
-# modified as well as the DNSEL table
+# modified
 $dbh->do("TRUNCATE TABLE Bandwidth${descriptorTable};");
 $dbh->do("TRUNCATE TABLE Descriptor${descriptorTable};");
 $dbh->do("TRUNCATE TABLE ORAddresses${descriptorTable};");
-$dbh->do("TRUNCATE TABLE DNSEL_INACT;");
 
 # Prepare the updating query
 $query1 = "INSERT INTO Descriptor${descriptorTable} (Name, IP, ORPort, DirPort, Platform, LastDescriptorPublished, Fingerprint, Uptime, BandwidthMAX, BandwidthBURST, BandwidthOBSERVED, OnionKey, SigningKey, Hibernating, Contact, WriteHistoryLAST, WriteHistoryINC, WriteHistorySERDATA, ReadHistoryLAST, ReadHistoryINC, ReadHistorySERDATA, FamilySERDATA, ExitPolicySERDATA, DescriptorSignature) VALUES ( ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? , ? )";
@@ -176,10 +175,6 @@ $dbresponse = $dbh->prepare($query1);
 
 $query4 = "INSERT INTO Bandwidth${descriptorTable} (fingerprint, `read`, `write`) VALUES (?, ?, ?)";
 my $dbresponse4 = $dbh->prepare($query4);
-
-# Prepare the DNSEL update
-$query = "INSERT INTO DNSEL_INACT (IP,ExitPolicy) VALUES ( ? , ? );";
-my $dbresponse2 = $dbh->prepare($query);
 
 $query5 = "INSERT INTO ORAddresses${descriptorTable} (descriptor_id, address, port) VALUES (?, ?, ?)";
 my $dbresponse5 = $dbh->prepare($query5);
@@ -475,8 +470,6 @@ while (<$torSocket>)
 		chop $currentRouter{'exitpolicy'};
 		my @exitpolicy = split(/!/,$currentRouter{'exitpolicy'});
 		$currentRouter{'ExitPolicySERDATA'} = serialize(\@exitpolicy);
-		# Create a string for the exit policy as well (for DNSEL)
-		my $exitpolicystring = join ('::',@exitpolicy);
 
 		# See if there is no family.  It should be blank, not NULL
 		# if there is none
@@ -624,9 +617,6 @@ while (<$torSocket>)
 		);
 
 		$router_id = $dbresponse->{mysql_insertid};
-
-		# Save to the DNSEL table as well
-		$dbresponse2->execute($currentRouter{'address'},$exitpolicystring);
 
 		# Update the read and write bandwidth history
 		$dbresponse4->execute($currentRouter{'Fingerprint'}, $currentRouter{'read'}, $currentRouter{'write'});
@@ -857,9 +847,6 @@ my $end_time = time();
 
 # Set the status to use the new data
 $dbh->do("UPDATE Status SET LastUpdate = now(), LastUpdateElapsed = ($end_time-$start_time), ActiveNetworkStatusTable = 'NetworkStatus${descriptorTable}', ActiveDescriptorTable = 'Descriptor${descriptorTable}', ActiveORAddressesTable = 'ORAddresses${descriptorTable}' WHERE ID = 1;");
-
-# Rename the DNSEL table so it is used
-$dbh->do("RENAME TABLE DNSEL TO tmp_table, DNSEL_INACT TO DNSEL, tmp_table TO DNSEL_INACT;");
 
 print { $torLogfile } strftime("UPDATE ENDED: %Y-%m-%d %H:%M:%S", localtime) . "\n";
 

@@ -119,7 +119,6 @@ $ColumnList_INACTIVE_DEFAULT = array
 $LocalTimeZone = "GMT";
 $OffsetFromGMT = 0;
 
-$DNSEL_Domain = null;
 $Hidden_Service_URL = null;
 
 // See if WHOIS wants the footer

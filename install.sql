@@ -132,46 +132,6 @@ CREATE TABLE `Descriptor2` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `DNSEL`
---
-
-CREATE TABLE `DNSEL` (
-  `ID` int(10) UNSIGNED NOT NULL,
-  `IP` varchar(256) DEFAULT NULL,
-  `ExitPolicy` varchar(8192) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `DNSEL_INACT`
---
-
-CREATE TABLE `DNSEL_INACT` (
-  `ID` int(10) UNSIGNED NOT NULL,
-  `IP` varchar(256) DEFAULT NULL,
-  `ExitPolicy` varchar(8192) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
--- Tabellenstruktur für Tabelle `DNSEL_LOG`
---
-
-CREATE TABLE `DNSEL_LOG` (
-  `ID` int(10) UNSIGNED NOT NULL,
-  `Timestamp` datetime DEFAULT NULL,
-  `TotalResponses` int(10) UNSIGNED DEFAULT NULL,
-  `NOERROR` int(10) UNSIGNED DEFAULT NULL,
-  `SERVFAIL` int(10) UNSIGNED DEFAULT NULL,
-  `NXDOMAIN` int(10) UNSIGNED DEFAULT NULL,
-  `NOTIMP` int(10) UNSIGNED DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
 -- Tabellenstruktur für Tabelle `hostnames`
 --
 
@@ -320,7 +280,6 @@ CREATE TABLE `Status` (
   `LastUpdateElapsed` int(10) UNSIGNED DEFAULT NULL,
   `ActiveNetworkStatusTable` varchar(256) DEFAULT NULL,
   `ActiveDescriptorTable` varchar(256) DEFAULT NULL,
-  `ActiveDNSELTable` varchar(256) DEFAULT NULL,
   `ActiveORAddressesTable` varchar(256) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -395,26 +354,6 @@ ALTER TABLE `Descriptor2`
   ADD KEY `Index_Platform` (`Platform`),
   ADD KEY `Index_Contact` (`Contact`),
   ADD KEY `Name` (`Name`);
-
---
--- Indizes für die Tabelle `DNSEL`
---
-ALTER TABLE `DNSEL`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `Index_IP` (`IP`);
-
---
--- Indizes für die Tabelle `DNSEL_INACT`
---
-ALTER TABLE `DNSEL_INACT`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `Index_IP` (`IP`);
-
---
--- Indizes für die Tabelle `DNSEL_LOG`
---
-ALTER TABLE `DNSEL_LOG`
-  ADD PRIMARY KEY (`ID`);
 
 --
 -- Indizes für die Tabelle `hostnames`
@@ -533,24 +472,6 @@ ALTER TABLE `Descriptor2`
   MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `DNSEL`
---
-ALTER TABLE `DNSEL`
-  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT für Tabelle `DNSEL_INACT`
---
-ALTER TABLE `DNSEL_INACT`
-  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT für Tabelle `DNSEL_LOG`
---
-ALTER TABLE `DNSEL_LOG`
-  MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT für Tabelle `hostnames`
 --
 ALTER TABLE `hostnames`
@@ -597,6 +518,6 @@ COMMIT;
 --
 INSERT INTO `NetworkStatusSource` (`ID`,`Fingerprint`,`Name`,`LastDescriptorPublished`,`IP`,`ORPort`,`DirPort`,`Platform`,`Contact`,`Uptime`,`BandwidthMAX`,`BandwidthBURST`,`BandwidthOBSERVED`,`OnionKey`,`SigningKey`,`WriteHistoryLAST`,`WriteHistoryINC`,`WriteHistorySERDATA`,`ReadHistoryLAST`,`ReadHistoryINC`,`ReadHistorySERDATA`,`ExitPolicySERDATA`,`FamilySERDATA`,`Hibernating`,`DescriptorSignature`) VALUES (1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
 
-INSERT INTO `Status` (`ID`,`LastUpdate`,`LastUpdateElapsed`,`ActiveNetworkStatusTable`,`ActiveDescriptorTable`,`ActiveDNSELTable`) VALUES (1,'2000-01-01 00:00:00',NULL,NULL,NULL,NULL);
+INSERT INTO `Status` (`ID`,`LastUpdate`,`LastUpdateElapsed`,`ActiveNetworkStatusTable`,`ActiveDescriptorTable`) VALUES (1,'2000-01-01 00:00:00',NULL,NULL,NULL);
 
 INSERT INTO `Mirrors` (`id`,`mirrors`) VALUES (1,'');
