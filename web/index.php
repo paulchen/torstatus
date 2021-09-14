@@ -2145,6 +2145,10 @@ else if ($SR == 'IP')
 {
 	$query = $query . " order by NIP " . $SO . ", Name Asc";
 }
+else if (in_array($SR, array('ID', 'Fingerprint', 'Name', 'LastDescriptorPublished', 'IP', 'ORPort', 'DirPort')))
+{
+	$query = $query . " order by $ActiveNetworkStatusTable.$SR $SO";
+}
 else
 {
 	$query = $query . " order by " . $SR . " " . $SO . ", Name Asc";
