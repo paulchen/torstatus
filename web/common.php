@@ -74,7 +74,7 @@ try {
 catch (Exception $e) {
 	die_503('Could not connect to: ' . $e->getMessage());
 }
-mysqli_report(MYSQLI_REPORT_ALL ^ MYSQLI_REPORT_STRICT);
+mysqli_report(MYSQLI_REPORT_ALL ^ MYSQLI_REPORT_STRICT ^ MYSQLI_REPORT_INDEX);
 
 // Get last update and active table information from database
 $query = "select LastUpdate, LastUpdateElapsed, ActiveNetworkStatusTable, ActiveDescriptorTable, ActiveORAddressesTable from Status";
