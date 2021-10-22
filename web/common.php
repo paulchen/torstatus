@@ -64,10 +64,17 @@ $memcached->addServer('127.0.0.1', 11211);
 $TimeStart = microtime(true);
 
 // Connect to database, select schema
-$mysqli = new mysqli($SQL_Server, $SQL_User, $SQL_Pass, $SQL_Catalog);
-if($mysqli->connect_error) {
-	die_503('Could not connect: ' . $link->connect_error);
+mysqli_report(MYSQLI_REPORT_STRICT);
+try {
+	$mysqli = new mysqli($SQL_Server, $SQL_User, $SQL_Pass, $SQL_Catalog);
+	if($mysqli->connect_error) {
+		die_503('Could not connect to: ' . $mysqli->connect_error);
+	}
 }
+catch (Exception $e) {
+	die_503('Could not connect to: ' . $e->getMessage());
+}
+mysqli_report(MYSQLI_REPORT_ALL ^ MYSQLI_REPORT_STRICT);
 
 // Get last update and active table information from database
 $query = "select LastUpdate, LastUpdateElapsed, ActiveNetworkStatusTable, ActiveDescriptorTable, ActiveORAddressesTable from Status";
