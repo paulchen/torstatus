@@ -1430,23 +1430,26 @@ $RouterCount = $record['Count'];
 $query = "select Name, IP, ORPort, DirPort, Fingerprint, Platform, LastDescriptorPublished, OnionKey, SigningKey, Contact, DescriptorSignature from NetworkStatusSource where ID = 1";
 $record = db_query_single_row($query, 1800);
 
-$Name = $record['Name'];
-$IP = $record['IP'];
-$ORPort = $record['ORPort'];
-$DirPort = $record['DirPort'];
-$Fingerprint = $record['Fingerprint'];
-$Platform = $record['Platform'];
-$LastDescriptorPublished = $record['LastDescriptorPublished'];
-$OnionKey = $record['OnionKey'];
-$SigningKey = $record['SigningKey'];
-$Contact = $record['Contact'];
-$DescriptorSignature = $record['DescriptorSignature'];
+$Name = $record ? $record['Name'] : '';
+$IP = $record ? $record['IP'] : '';
+$ORPort = $record ? $record['ORPort'] : '';
+$DirPort = $record ? $record['DirPort'] : '';
+$Fingerprint = $record ? $record['Fingerprint'] : '';
+$Platform = $record ? $record['Platform'] : '';
+$LastDescriptorPublished = $record ? $record['LastDescriptorPublished'] : '';
+$OnionKey = $record ? $record['OnionKey'] : '';
+$SigningKey = $record ? $record['SigningKey'] : '';
+$Contact = $record ? $record['Contact'] : '';
+$DescriptorSignature = $record ? $record['DescriptorSignature'] : '';
 
-$query = "select Hostname, CountryCode from $ActiveNetworkStatusTable where Fingerprint = '$Fingerprint'";
-$record = db_query_single_row($query, 1800);
+if ($Fingerprint)
+{
+	$query = "select Hostname, CountryCode from $ActiveNetworkStatusTable where Fingerprint = '$Fingerprint'";
+	$record = db_query_single_row($query, 1800);
 
-$Hostname = $record['Hostname'];
-$CountryCode = $record['CountryCode'];
+	$Hostname = $record['Hostname'];
+	$CountryCode = $record['CountryCode'];
+}
 
 // Determine if client IP exists in database as a Tor server
 $query = "select count(*) as Count from $ActiveNetworkStatusTable where IP = '$RemoteIP'";
@@ -2539,19 +2542,25 @@ function toggleANSS()
 <td class='TRSB'>
 <?php
 
-echo "<b>Nickname:</b><br/><a class='plainbox' href='router_detail.php?FP=$Fingerprint'>" . $Name . "</a><br/>\n";
-echo "<b>Fingerprint:</b><br/>" . chunk_split(strtoupper($Fingerprint), 4, " ") . "<br/>\n";
-echo "<b>Country Code:</b><br/>"; if($CountryCode == null){echo "Unknown";}else{echo $CountryCode;} echo "<br/>\n";
-echo "<b>Contact:</b><br/>"; if($Contact == null){echo "None Given";} else{$Contact = htmlspecialchars($Contact, ENT_QUOTES); echo "$Contact";} echo "<br/>\n";
-echo "<b>Platform:</b><br/>" . $Platform . "<br/>\n";
-echo "<b>IP Address:</b><br/>" . $IP . "<br/>\n";
-echo "<b>Hostname:</b><br/>"; if ($IP == $Hostname){echo "Unavailable";} else{echo "$Hostname";} echo "<br/>\n";
-echo "<b>Onion Router Port:</b><br/>" . $ORPort . "<br/>\n";
-echo "<b>Directory Server Port:</b><br/>"; if($DirPort == 0){echo "None";} else {echo $DirPort;} echo "<br/>\n";
-echo "<b>Last Published Descriptor (GMT):</b><br/>" . $LastDescriptorPublished . "<br/><br/>\n";
-echo "<b>Onion Key:</b><pre>" . $OnionKey . "</pre>\n";
-echo "<b>Signing Key:</b><pre>" . $SigningKey . "</pre>\n";
-echo "<b>Descriptor Signature:</b><pre>" . $DescriptorSignature . "</pre>\n";
+if($Fingerprint)
+{
+	echo "<b>Nickname:</b><br/><a class='plainbox' href='router_detail.php?FP=$Fingerprint'>" . $Name . "</a><br/>\n";
+	echo "<b>Fingerprint:</b><br/>" . chunk_split(strtoupper($Fingerprint), 4, " ") . "<br/>\n";
+	echo "<b>Country Code:</b><br/>"; if($CountryCode == null){echo "Unknown";}else{echo $CountryCode;} echo "<br/>\n";
+	echo "<b>Contact:</b><br/>"; if($Contact == null){echo "None Given";} else{$Contact = htmlspecialchars($Contact, ENT_QUOTES); echo "$Contact";} echo "<br/>\n";
+	echo "<b>Platform:</b><br/>" . $Platform . "<br/>\n";
+	echo "<b>IP Address:</b><br/>" . $IP . "<br/>\n";
+	echo "<b>Hostname:</b><br/>"; if ($IP == $Hostname){echo "Unavailable";} else{echo "$Hostname";} echo "<br/>\n";
+	echo "<b>Onion Router Port:</b><br/>" . $ORPort . "<br/>\n";
+	echo "<b>Directory Server Port:</b><br/>"; if($DirPort == 0){echo "None";} else {echo $DirPort;} echo "<br/>\n";
+	echo "<b>Last Published Descriptor (GMT):</b><br/>" . $LastDescriptorPublished . "<br/><br/>\n";
+	echo "<b>Onion Key:</b><pre>" . $OnionKey . "</pre>\n";
+	echo "<b>Signing Key:</b><pre>" . $SigningKey . "</pre>\n";
+	echo "<b>Descriptor Signature:</b><pre>" . $DescriptorSignature . "</pre>\n";
+}
+else {
+	echo "Data source is a client, not a relay, therefore no detailled information is available";
+}
 ?>
 </td>
 </tr>
