@@ -38,17 +38,17 @@
 use DBI;
 use IO::Socket::INET;
 use PHP::Serialization qw(serialize unserialize);
-use Geo::IP;
 use MIME::Base64;
 use LWP::Simple;
 use Date::Parse;
 use File::Touch;
 use Time::HiRes qw(gettimeofday);
 use Parallel::ForkManager;
-use POSIX qw(strftime);
+use POSIX qw(strftime floor);
 use Cache::Memcached;
 use IO::Handle;
 use Data::Dumper;
+use Net::IP;
 
 print gettimeofday() . "\n";
 
@@ -58,7 +58,6 @@ $SIG{ALRM} = sub {die "timeout"};
 
 # Caching constansts for increased speed
 my %CACHE;
-my %geoIPCache;
 
 # First the configuration file must be read
 # All of the variables will be inputed into a hash for ease of use
@@ -96,6 +95,53 @@ my $memcached = new Cache::Memcached {
 	'compress_threshold' => 10_000
 };
 $memcached->enable_compress(0);
+
+sub init_countries {
+	my @ip_list;
+	open (my $csv, '<', '/usr/share/tor/geoip') || die "cant open";
+	foreach (<$csv>) {
+		chomp;
+		if ($_ =~ /^#/ || $_ eq '') {
+			next;
+		}
+	my @fields = split(/\,/);
+		push @ip_list, \@fields;
+	}
+	return @ip_list;
+}
+
+our @ip_list = init_countries();
+
+sub get_country {
+	my ($ip) = @_;
+	my $intip = new Net::IP($ip)->intip();
+	my $left = 0;
+	my $right = $#ip_list - 1;
+
+	while (1) {
+		my $index = floor(($left + $right) / 2);
+
+		my $ip_entry = $ip_list[$index];
+		my @array = @{$ip_entry};
+		my $from = $array[0];
+		my $to = $array[1];
+
+		if($from <= $intip && $to >= $intip) {
+			my $country = $array[2];
+			return $country;
+		}
+
+		if($left == $right) {
+			return '';
+		}
+		if($from > $intip) {
+			$right = $index;
+		}
+		else {
+			$left = $index + 1;
+		}
+	}
+}
 
 # Initiate a connection to the MySQL server
 my $dbh = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$config{'SQL_Server'},$config{'SQL_User'},$config{'SQL_Pass'}, {
@@ -642,9 +688,6 @@ print "Number of routers: $router_count\n";
 
 ############ Updating network status #########################################
 
-# Geo::IP needs to be loaded
-my $gi = Geo::IP->open($config{'GEOIP_Database_Path'} . "GeoIP.dat",GEOIP_STANDARD);
-
 # Delete all of the records from the network status table that is going to be
 # modified
 $dbh->do("TRUNCATE TABLE NetworkStatus${descriptorTable};");
@@ -734,17 +777,10 @@ while (<$torSocket>)
 		$currentRouter{'ORPort'} = $7;
 		$currentRouter{'DirPort'} = $8;
 
-		print "B1: " . gettimeofday() . "\n";
+		print "B1: " . gettimeofday() . " - searching for country of ip $6\n";
 		# We need to find the country of the IP
-		if ($geoIPCache{$6})
-		{
-			$currentRouter{'Country'} = $geoIPCache{$6};
-		}
-		else
-		{
-			$currentRouter{'Country'} = $gi->country_code_by_addr($6);
-			$geoIPCache{$6} = $currentRouter{'Country'};
-		}
+
+		$currentRouter{'Country'} = get_country($6);
 
 		print "B2: " . gettimeofday() . "\n";
 		# And the host by addr
