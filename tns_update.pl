@@ -128,6 +128,12 @@ sub get_country {
 
 		if($from <= $intip && $to >= $intip) {
 			my $country = $array[2];
+			print($country);
+			if ($country eq '??') {
+				print("country: 2");
+				return '';
+			}
+			print("country: 1");
 			return $country;
 		}
 
