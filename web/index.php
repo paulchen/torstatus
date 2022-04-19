@@ -42,7 +42,6 @@ if ($DetermineUsingSSL == 1)
 }
 
 $Self = $_SERVER['PHP_SELF'];
-$Host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
 $forwardedFor = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
 $xff = array_map( 'trim', explode( ',',$forwardedFor ) );
 $xff = array_reverse( $xff );
@@ -2182,7 +2181,7 @@ fetch_mirrors();
 <div class="topbar" id="topbar"><br/>
 <table width="100%"><tr><td style="vertical-align: bottom;">
 <a href="/?CSInput=" class="logoimage"><img src="img/logo.png" alt="TorStatus" class="topbarlogo"/></a>
-<span class="logotext"><?php echo $TorNetworkStatus_Version; ?><?php if ($UsingSSL == 1) { ?> - Encrypted connection<?php } elseif ($AllowSSL) { ?> - <a href="<?php echo $SSLLink  ?>" class="plain">Use an encrypted connection <b>(recommended)</b></a><?php } ?></span>
+<?php connection_information(); ?>
 </td><td style="vertical-align: bottom; text-align: right;">
 <form action="<?php echo $Self; ?>" method="post" name="search">
 <input type="hidden" name="CSMod" value="Contains" />
@@ -2256,7 +2255,7 @@ Good job, you do not have JavaScript enabled!
 
 <?php
 
-if(preg_match('/^[0-9a-z]*\.onion$/', $Host))
+if($onion_service)
 {
 	echo '<tr><td class="tab"><img src="/img/usingtor.png" alt="You are using Tor" /></td><td class="content" style="text-align: center">';
 	echo '<span class="usingTor">You appear to be accessing this server through the Tor network as an Onion service.</span>';
@@ -2294,7 +2293,6 @@ if($Hidden_Service_URL != null)
 	echo "<tr>\n";
 	echo "<td colspan='2' style='border-top: solid 1px black; text-align: center;'><br />";
 	echo "<font color='#3344ee'>This site is available as an Onion V3 Service at:</font><br/><a style='text-decoration: underline; color: #3344ee;' href='$Hidden_Service_URL'>$Hidden_Service_URL</a><br/><br/>";
-	echo "<span style='color: #3344ee'>Deprecated Onion V2 Service still available at:</span><br /><a style='text-decoration: underline; color: #3344ee;' href='http://jlve2y45zacpbz6s.onion/'>http://jlve2y45zacpbz6s.onion/</a><br/><br/>";
 	echo "</td>\n";
 	echo "</tr>\n";
 }

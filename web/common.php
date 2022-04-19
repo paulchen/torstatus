@@ -51,6 +51,22 @@ function fetch_mirrors() {
 	$mirrorList = $mirrorListRow['mirrors'];
 }
 
+function connection_information() {
+	global $TorNetworkStatus_Version, $onion_service, $UsingSSL, $AllowSSL, $Self, $SSLLink;
+?>
+<span class="logotext">
+	<?php echo $TorNetworkStatus_Version; ?>
+	<?php if($onion_service): ?>
+		- Connection via onion service
+	<?php elseif ($UsingSSL == 1): ?>
+		- Encrypted connection
+	<?php elseif ($AllowSSL): ?>
+		- <a href="<?php echo $SSLLink; echo substr($Self,-(strlen($Self)-1)); echo "?"; echo $_SERVER['QUERY_STRING'];  ?>" class="plain">Use an encrypted connection <b>(recommended)</b></a>
+	<?php endif; ?>
+</span>
+<?php
+}
+
 // Start new session
 @session_start() or die_400();
 
@@ -97,6 +113,8 @@ $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $mysqli->escape_string($_SERV
 $request_uri = isset($_SERVER['REQUEST_URI']) ? $mysqli->escape_string($_SERVER['REQUEST_URI']) : '';
 $session_id = $mysqli->escape_string(session_id());
 $ip = isset($_SERVER['REMOTE_ADDR']) ? $mysqli->escape_string($_SERVER['REMOTE_ADDR']) : '';
+$Host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+$onion_service = preg_match('/^[0-9a-z]*\.onion$/', $Host);
 
 #$query = "INSERT INTO access_log (`timestamp`, year, month, day, hour, minute, second, user_agent, request_uri, session_id, ip) VALUES (FROM_UNIXTIME($timestamp), '$year', '$month', '$day', '$hour', '$minute', '$second', '$user_agent', '$request_uri', '$session_id', '$ip')";
 #$mysqli->query($query);
