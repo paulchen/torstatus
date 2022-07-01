@@ -1451,7 +1451,7 @@ if ($Fingerprint)
 }
 
 // Determine if client IP exists in database as a Tor server
-$query = "select count(*) as Count from $ActiveNetworkStatusTable where IP = '$RemoteIP'";
+$query = "select count(*) as Count from $ActiveNetworkStatusTable where IP = '$RemoteIP' and FExit = 1";
 $record = db_query_single_row($query, 1800);
 
 $RemoteIPDBCount = $record['Count'];
@@ -1461,7 +1461,12 @@ if ($RemoteIPDBCount > 0)
 	$PositiveMatch_IP = 1;	
 }
 else {
-	$query = "select count(*) as Count from $ActiveORAddressesTable where address = '$RemoteIP'";
+	$query = "select count(*) as Count
+		from $ActiveORAddressesTable
+			join $ActiveDescriptorTable on $ActiveDescriptorTable.ID = $ActiveORAddressesTable.descriptor_id
+			join $ActiveNetworkStatusTable on $ActiveNetworkStatusTable.Fingerprint = $ActiveDescriptorTable.Fingerprint
+		where address = '$RemoteIP'
+			and $ActiveNetworkStatusTable.FExit = 1";
 	$record = db_query_single_row($query, 1800);
 
 	$RemoteIPDBCount = $record['Count'];
