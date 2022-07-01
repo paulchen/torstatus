@@ -21,6 +21,10 @@ if ($DetermineUsingSSL == 1)
 
 fetch_mirrors();
 
+if(!$onion_service) {
+	header("onion-location: $Hidden_Service_URL" . mb_substr($_SERVER['REQUEST_URI'], 1));
+}
+
 ?><!DOCTYPE html 
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
