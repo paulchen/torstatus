@@ -14,7 +14,7 @@ require_once('jpgraph_plotmark.inc.php');
 class RadarLogTicks extends Ticks {
 //---------------
 // CONSTRUCTOR
-    function RadarLogTicks() {
+    function __construct() {
     }
 //---------------
 // PUBLIC METHODS	
@@ -96,7 +96,7 @@ class RadarLinearTicks extends Ticks { // extends LinearTicks {
 
 //---------------
 // CONSTRUCTOR
-    function RadarLinearTicks() {
+    function __construct() {
 	// Empty
     }
 
@@ -202,8 +202,8 @@ class RadarAxis extends AxisPrototype {
     public $title=null;
 //---------------
 // CONSTRUCTOR
-    function RadarAxis($img,$aScale,$color=array(0,0,0)) {
-	parent::Axis($img,$aScale,$color);
+    function __construct($img,$aScale,$color=array(0,0,0)) {
+	parent::__construct($img,$aScale,$color);
 	$this->len=$img->plotheight;
 	$this->title = new Text();
 	$this->title->SetFont(FF_FONT1,FS_BOLD);
@@ -322,7 +322,7 @@ class RadarGrid { //extends Grid {
 
 //------------
 // CONSTRUCTOR
-    function RadarGrid() {
+    function __construct() {
     }
 
 // PUBLIC METHODS
@@ -388,7 +388,7 @@ class RadarPlot {
     private $linestyle='solid';
 //---------------
 // CONSTRUCTOR
-    function RadarPlot($data) {
+    function __construct($data) {
 	$this->data = $data;
 	$this->mark = new PlotMark();
     }
@@ -505,8 +505,8 @@ class RadarGraph extends Graph {
     private $axis_title=null;
 //---------------
 // CONSTRUCTOR
-    function RadarGraph($width=300,$height=200,$cachedName="",$timeout=0,$inline=1) {
-	$this->Graph($width,$height,$cachedName,$timeout,$inline);
+    function __construct($width=300,$height=200,$cachedName="",$timeout=0,$inline=1) {
+	parent::__construct($width,$height,$cachedName,$timeout,$inline);
 	$this->posx=$width/2;
 	$this->posy=$height/2;
 	$this->len=min($width,$height)*0.35;

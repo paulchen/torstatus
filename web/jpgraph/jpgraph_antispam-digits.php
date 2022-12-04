@@ -12,7 +12,7 @@ class HandDigits {
     public $digits = array();
     public $iHeight=30, $iWidth=30;
 
-    function HandDigits() {
+    function __construct() {
 //==========================================================
 // d6-small.jpg
 //==========================================================
@@ -156,7 +156,7 @@ class AntiSpam {
 
     var $iNumber='';
 
-    function AntiSpam($aNumber='') {
+    function __construct($aNumber='') {
 	$this->iNumber = $aNumber;
     }
 

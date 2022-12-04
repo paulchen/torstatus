@@ -35,8 +35,8 @@ class LinePlot extends Plot{
 
 //---------------
 // CONSTRUCTOR
-    function LinePlot($datay,$datax=false) {
-	$this->Plot($datay,$datax);
+    function __construct($datay,$datax=false) {
+	parent::__construct($datay,$datax);
 	$this->mark = new PlotMark() ;
     }
 //---------------

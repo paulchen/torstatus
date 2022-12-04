@@ -16,7 +16,7 @@ $__jpg_err_locale = DEFAULT_ERR_LOCALE;
 
 class ErrMsgText {
     private $lt=NULL;
-    function ErrMsgText() {
+    function __construct() {
 	GLOBAL $__jpg_err_locale;
 	$file = 'lang/'.$__jpg_err_locale.'.inc.php';
 
@@ -123,7 +123,7 @@ class JpGraphErrObject {
     protected $iDest = false;
 
 
-    function JpGraphErrObject() {
+    function __construct() {
 	// Empty. Reserved for future use
     }
 

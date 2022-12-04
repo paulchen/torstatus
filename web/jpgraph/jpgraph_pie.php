@@ -55,7 +55,7 @@ class PiePlot {
 	
 //---------------
 // CONSTRUCTOR
-    function PiePlot($data) {
+    function __construct($data) {
 	$this->data = array_reverse($data);
 	$this->title = new Text("");
 	$this->title->SetFont(FF_FONT1,FS_BOLD);
@@ -937,8 +937,8 @@ class PiePlotC extends PiePlot {
     public $midtitle='';
     private $middlecsimtarget="",$middlecsimalt="";
 
-    function PiePlotC($data,$aCenterTitle='') {
-	parent::PiePlot($data);
+    function __construct($data,$aCenterTitle='') {
+	parent::__construct($data);
 	$this->midtitle = new Text();
 	$this->midtitle->ParagraphAlign('center');
     }
@@ -1126,8 +1126,8 @@ class PieGraph extends Graph {
     public $pieaa = false ;
 //---------------
 // CONSTRUCTOR
-    function PieGraph($width=300,$height=200,$cachedName="",$timeout=0,$inline=1) {
-	$this->Graph($width,$height,$cachedName,$timeout,$inline);
+    function __construct($width=300,$height=200,$cachedName="",$timeout=0,$inline=1) {
+	parent::__construct($width,$height,$cachedName,$timeout,$inline);
 	$this->posx=$width/2;
 	$this->posy=$height/2;
 	$this->SetColor(array(255,255,255));		

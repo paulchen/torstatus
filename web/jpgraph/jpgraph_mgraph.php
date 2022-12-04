@@ -29,7 +29,7 @@ class MGraph {
 	$background_image_y=NULL, $background_image_x=NULL;
 
     // Create a new instane of the combined graph
-    function MGraph($aWidth=NULL,$aHeight=NULL) {
+    function __construct($aWidth=NULL,$aHeight=NULL) {
 	$this->iWidth = $aWidth;
 	$this->iHeight = $aHeight;
     }

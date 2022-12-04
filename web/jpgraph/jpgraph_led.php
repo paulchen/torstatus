@@ -58,7 +58,7 @@ class DigitalLED74 {
 
 	$iSuperSampling = 3, $iMarg = 1, $iRad = 4 ;
     
-    function DigitalLED74($aRadius=2,$aMargin=0.6) {
+    function __construct($aRadius=2,$aMargin=0.6) {
 	$this->iRad = $aRadius;
 	$this->iMarg = $aMargin;
     }

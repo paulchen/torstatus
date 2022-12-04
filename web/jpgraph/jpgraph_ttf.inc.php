@@ -186,7 +186,7 @@ class TTF {
 
 //---------------
 // CONSTRUCTOR
-    function TTF() {
+    function __construct() {
 
 	// String names for font styles to be used in error messages
 	$this->style_names=array(FS_NORMAL	=>'normal',

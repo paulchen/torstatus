@@ -22,7 +22,7 @@ class PiePlot3D extends PiePlot {
 	
 //---------------
 // CONSTRUCTOR
-    function PiePlot3d($data) {
+    function __construct($data) {
 	$this->radius = 0.5;
 	$this->data = $data;
 	$this->title = new Text("");
