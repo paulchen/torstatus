@@ -1596,122 +1596,29 @@ $DescriptorCount = $record['Count'];
 
 // Prepare and execute master router query
 $query = "select $ActiveNetworkStatusTable.Name, $ActiveNetworkStatusTable.Fingerprint";
-
-if (in_array("CountryCode", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveNetworkStatusTable.CountryCode";
-}
-
-if (in_array("Bandwidth", $ColumnList_ACTIVE))
-{
-	$query .= ", floor($ActiveDescriptorTable.BandwidthOBSERVED / 1024) as Bandwidth";
-}
-
-if (in_array("Uptime", $ColumnList_ACTIVE))
-{
-	$query .= ", floor(((UNIX_TIMESTAMP() - (UNIX_TIMESTAMP($ActiveDescriptorTable.LastDescriptorPublished) + $OffsetFromGMT)) + CAST($ActiveDescriptorTable.Uptime AS DECIMAL)) / 3600) as Uptime";
-}
-
-if (in_array("LastDescriptorPublished", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveDescriptorTable.LastDescriptorPublished";
-}
-
-if (in_array("Hostname", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveNetworkStatusTable.Hostname";
-}
-
-if (in_array("IP", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveNetworkStatusTable.IP";
-}
-
-if (in_array("ORPort", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveNetworkStatusTable.ORPort";
-}
-
-if (in_array("DirPort", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveNetworkStatusTable.DirPort";
-}
-
-if (in_array("Platform", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveDescriptorTable.Platform";
-}
-
-if (in_array("Contact", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveDescriptorTable.Contact";
-}
-
-if (in_array("Authority", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveNetworkStatusTable.FAuthority as Authority";
-}
-
-if (in_array("BadDir", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveNetworkStatusTable.FBadDirectory as BadDir";
-}
-
-if (in_array("BadExit", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveNetworkStatusTable.FBadExit as BadExit";
-}
-
-if (in_array("Exit", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveNetworkStatusTable.FExit as 'Exit'";
-}
-
-if (in_array("Fast", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveNetworkStatusTable.FFast as Fast";
-}
-
-if (in_array("Guard", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveNetworkStatusTable.FGuard as Guard";
-}
-
-if (in_array("Hibernating", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveDescriptorTable.Hibernating as 'Hibernating'";
-}
-
-if (in_array("Named", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveNetworkStatusTable.FNamed as Named";
-}
-
-if (in_array("Stable", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveNetworkStatusTable.FStable as Stable";
-}
-
-if (in_array("Running", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveNetworkStatusTable.FRunning as Running";
-}
-
-if (in_array("Valid", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveNetworkStatusTable.FValid as Valid";
-}
-
-if (in_array("V2Dir", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveNetworkStatusTable.FV2Dir as V2Dir";
-}
-
-if (in_array("HSDir", $ColumnList_ACTIVE))
-{
-	$query .= ", $ActiveNetworkStatusTable.FHSDir as HSDir";
-}
-
+$query .= ", $ActiveNetworkStatusTable.CountryCode";
+$query .= ", floor($ActiveDescriptorTable.BandwidthOBSERVED / 1024) as Bandwidth";
+$query .= ", floor(((UNIX_TIMESTAMP() - (UNIX_TIMESTAMP($ActiveDescriptorTable.LastDescriptorPublished) + $OffsetFromGMT)) + CAST($ActiveDescriptorTable.Uptime AS DECIMAL)) / 3600) as Uptime";
+$query .= ", $ActiveDescriptorTable.LastDescriptorPublished";
+$query .= ", $ActiveNetworkStatusTable.Hostname";
+$query .= ", $ActiveNetworkStatusTable.IP";
+$query .= ", $ActiveNetworkStatusTable.ORPort";
+$query .= ", $ActiveNetworkStatusTable.DirPort";
+$query .= ", $ActiveDescriptorTable.Platform";
+$query .= ", $ActiveDescriptorTable.Contact";
+$query .= ", $ActiveNetworkStatusTable.FAuthority as Authority";
+$query .= ", $ActiveNetworkStatusTable.FBadDirectory as BadDir";
+$query .= ", $ActiveNetworkStatusTable.FBadExit as BadExit";
+$query .= ", $ActiveNetworkStatusTable.FExit as 'Exit'";
+$query .= ", $ActiveNetworkStatusTable.FFast as Fast";
+$query .= ", $ActiveNetworkStatusTable.FGuard as Guard";
+$query .= ", $ActiveDescriptorTable.Hibernating as 'Hibernating'";
+$query .= ", $ActiveNetworkStatusTable.FNamed as Named";
+$query .= ", $ActiveNetworkStatusTable.FStable as Stable";
+$query .= ", $ActiveNetworkStatusTable.FRunning as Running";
+$query .= ", $ActiveNetworkStatusTable.FValid as Valid";
+$query .= ", $ActiveNetworkStatusTable.FV2Dir as V2Dir";
+$query .= ", $ActiveNetworkStatusTable.FHSDir as HSDir";
 $query .= ", INET_ATON($ActiveNetworkStatusTable.IP) as NIP from $ActiveNetworkStatusTable inner join $ActiveDescriptorTable on $ActiveNetworkStatusTable.Fingerprint = $ActiveDescriptorTable.Fingerprint";
 
 if ($FAuthority != 'OFF')
