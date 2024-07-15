@@ -4257,7 +4257,7 @@ class LinearTicks extends Ticks {
 	    if( $t > 0 )
 		$precision = 0;
 	    else
-		$precision = -floor($t);
+		$precision = abs(floor($t));
 	}
 	else
 	    $precision = $this->precision;
