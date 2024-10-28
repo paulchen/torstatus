@@ -62,7 +62,7 @@ my %CACHE;
 # First the configuration file must be read
 # All of the variables will be inputed into a hash for ease of use
 my %config;
-open (my $config_handle, "<", "web/config.php");
+open (my $config_handle, "<", "../web/config.php");
 while (<$config_handle>)
 {
 	# A regular expression is going to try to pull out the configuration
@@ -90,7 +90,7 @@ close ($config_handle);
 my $start_time = time();
 
 my $memcached = new Cache::Memcached {
-	'servers' => [ '127.0.0.1:11211' ],
+	'servers' => [ 'memcached:11211' ],
 	'debug' => 0,
 	'compress_threshold' => 10_000
 };
@@ -150,7 +150,7 @@ sub get_country {
 }
 
 # Initiate a connection to the MySQL server
-my $dbh = DBI->connect('DBI:mysql:database='.$config{'SQL_Catalog'}.';host='.$config{'SQL_Server'},$config{'SQL_User'},$config{'SQL_Pass'}, {
+my $dbh = DBI->connect('DBI:MariaDB:database='.$config{'SQL_Catalog'}.';host='.$config{'SQL_Server'},$config{'SQL_User'},$config{'SQL_Pass'}, {
 	PrintError => 0,
 	RaiseError => 1,
 	AutoCommit => 0
@@ -668,7 +668,7 @@ while (<$torSocket>)
 		 $currentRouter{'DescriptorSignature'}
 		);
 
-		$router_id = $dbresponse->{mysql_insertid};
+		$router_id = $dbresponse->last_insert_id();
 
 		# Update the read and write bandwidth history
 		$dbresponse4->execute($currentRouter{'Fingerprint'}, $currentRouter{'read'}, $currentRouter{'write'});
@@ -903,7 +903,7 @@ close($torLogfile);
 # Sleep for the desired time from the configuration file
 # print "6\n";
 my @file_list = ('/var/www/TorNetworkStatus/last_update');
-touch(@file_list);
+#TODO touch(@file_list);
 exit 0;
 
 ############ Subroutines #####################################################

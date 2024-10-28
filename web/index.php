@@ -353,7 +353,7 @@ $country_codes = array (
 
 );
 
-require_once(dirname(__FILE__) . '/../lib/iputils/IpUtils.php');
+require_once(dirname(__FILE__) . '/iputils/IpUtils.php');
 
 // Function Declarations
 function IsIPInSubnet($IP,$Subnet)
@@ -792,15 +792,15 @@ function DisplayRouterRow()
 			}
 
 			$bandwidthtop = 1000/85;
-			if ($bandwidth % 1000 == 0 && $bandwidth != 0)
+			if (intval($bandwidth) % 1000 == 0 && $bandwidth != 0)
 			{
 				$bandwidth = 999;
 			}
-			$bandwidth = floor(($bandwidth % 1000)/$bandwidthtop);
+			$bandwidth = floor((intval($bandwidth) % 1000)/$bandwidthtop);
 			if ($bandwidth > 85) { $bandwidth = 85; }
 			if ($bandwidth == 0) { $bandwidth = 1; }
 			#echo "<td class='TDb'><table cellspacing='0' cellpadding='0' class='bwb'><tr title='".$record[$value]." KBs'><td class='$background'><img src='img/bar/${foreground}.png' width='${bandwidth}px' height='16px' alt='".$record[$value]."' /></td><td>&nbsp;<small>&nbsp;".$record[$value]."</small></td></tr></table></td>";
-			echo "<td class='TDb'><table cellspacing='0' cellpadding='0' class='bwb'><tr title='".$record[$value]." KBs'><td class='$background'><div class='fg${foreground}' style='width: ${bandwidth}px; height: 16px;' /></td><td>&nbsp;<small>&nbsp;".$record[$value]."</small></td></tr></table></td>";
+			echo "<td class='TDb'><table cellspacing='0' cellpadding='0' class='bwb'><tr title='".$record[$value]." KBs'><td class='$background'><div class='fg{$foreground}' style='width: {$bandwidth}px; height: 16px;' /></td><td>&nbsp;<small>&nbsp;".$record[$value]."</small></td></tr></table></td>";
 			break;
 
   			case

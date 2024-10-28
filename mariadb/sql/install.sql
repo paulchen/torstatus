@@ -22,6 +22,10 @@ SET time_zone = "+00:00";
 -- Datenbank: `torstatus`
 --
 
+CREATE DATABASE `torstatus`;
+USE `torstatus`;
+GRANT ALL PRIVILEGES ON torstatus.* TO torstatus@'%' IDENTIFIED BY 'torstatus';
+
 -- --------------------------------------------------------
 
 --
@@ -31,9 +35,9 @@ SET time_zone = "+00:00";
 CREATE TABLE `Bandwidth` (
   `id` int(11) NOT NULL,
   `fingerprint` tinytext NOT NULL,
-  `write` blob NOT NULL,
-  `read` blob NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `write` blob,
+  `read` blob
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -44,9 +48,9 @@ CREATE TABLE `Bandwidth` (
 CREATE TABLE `Bandwidth1` (
   `id` int(11) NOT NULL,
   `fingerprint` tinytext NOT NULL,
-  `write` blob NOT NULL,
-  `read` blob NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `write` blob,
+  `read` blob
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -57,9 +61,9 @@ CREATE TABLE `Bandwidth1` (
 CREATE TABLE `Bandwidth2` (
   `id` int(11) NOT NULL,
   `fingerprint` tinytext NOT NULL,
-  `write` blob NOT NULL,
-  `read` blob NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `write` blob,
+  `read` blob
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -76,7 +80,7 @@ CREATE TABLE `Descriptor1` (
   `ORPort` int(10) UNSIGNED DEFAULT NULL,
   `DirPort` int(10) UNSIGNED DEFAULT NULL,
   `Platform` varchar(256) DEFAULT NULL,
-  `Contact` varchar(256) DEFAULT NULL,
+  `Contact` mediumtext DEFAULT NULL,
   `Uptime` bigint(20) UNSIGNED DEFAULT NULL,
   `BandwidthMAX` int(10) UNSIGNED DEFAULT NULL,
   `BandwidthBURST` int(10) UNSIGNED DEFAULT NULL,
@@ -93,7 +97,7 @@ CREATE TABLE `Descriptor1` (
   `FamilySERDATA` text,
   `Hibernating` tinyint(1) UNSIGNED DEFAULT NULL,
   `DescriptorSignature` varchar(1024) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -110,7 +114,7 @@ CREATE TABLE `Descriptor2` (
   `ORPort` int(10) UNSIGNED DEFAULT NULL,
   `DirPort` int(10) UNSIGNED DEFAULT NULL,
   `Platform` varchar(256) DEFAULT NULL,
-  `Contact` varchar(256) DEFAULT NULL,
+  `Contact` mediumtext DEFAULT NULL,
   `Uptime` bigint(20) UNSIGNED DEFAULT NULL,
   `BandwidthMAX` int(10) UNSIGNED DEFAULT NULL,
   `BandwidthBURST` int(10) UNSIGNED DEFAULT NULL,
@@ -127,7 +131,7 @@ CREATE TABLE `Descriptor2` (
   `FamilySERDATA` text,
   `Hibernating` tinyint(1) UNSIGNED DEFAULT NULL,
   `DescriptorSignature` varchar(1024) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -139,7 +143,7 @@ CREATE TABLE `hostnames` (
   `id` int(11) NOT NULL,
   `ip` varchar(15) NOT NULL,
   `hostname` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -150,7 +154,7 @@ CREATE TABLE `hostnames` (
 CREATE TABLE `Mirrors` (
   `id` int(11) NOT NULL,
   `mirrors` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -160,7 +164,7 @@ CREATE TABLE `Mirrors` (
 
 CREATE TABLE `missing_countries` (
   `country_code` varchar(2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -170,7 +174,7 @@ CREATE TABLE `missing_countries` (
 
 CREATE TABLE `missing_flags` (
   `country_code` varchar(2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -201,7 +205,7 @@ CREATE TABLE `NetworkStatus1` (
   `FValid` tinyint(1) UNSIGNED DEFAULT NULL,
   `FV2Dir` tinyint(1) UNSIGNED DEFAULT NULL,
   `FHSDir` tinyint(1) UNSIGNED DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -232,7 +236,7 @@ CREATE TABLE `NetworkStatus2` (
   `FValid` tinyint(1) UNSIGNED DEFAULT NULL,
   `FV2Dir` tinyint(1) UNSIGNED DEFAULT NULL,
   `FHSDir` tinyint(1) UNSIGNED DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -258,15 +262,15 @@ CREATE TABLE `NetworkStatusSource` (
   `SigningKey` varchar(1024) DEFAULT NULL,
   `WriteHistoryLAST` datetime DEFAULT NULL,
   `WriteHistoryINC` int(10) UNSIGNED DEFAULT NULL,
-  `WriteHistorySERDATA` varchar(8192) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
+  `WriteHistorySERDATA` blob DEFAULT NULL,
   `ReadHistoryLAST` datetime DEFAULT NULL,
   `ReadHistoryINC` int(10) UNSIGNED DEFAULT NULL,
-  `ReadHistorySERDATA` varchar(8192) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
-  `ExitPolicySERDATA` varchar(8192) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
-  `FamilySERDATA` varchar(8192) CHARACTER SET latin1 COLLATE latin1_bin DEFAULT NULL,
+  `ReadHistorySERDATA` blob DEFAULT NULL,
+  `ExitPolicySERDATA` blob DEFAULT NULL,
+  `FamilySERDATA` blob DEFAULT NULL,
   `Hibernating` tinyint(1) UNSIGNED DEFAULT NULL,
   `DescriptorSignature` varchar(1024) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -281,7 +285,7 @@ CREATE TABLE `Status` (
   `ActiveNetworkStatusTable` varchar(256) DEFAULT NULL,
   `ActiveDescriptorTable` varchar(256) DEFAULT NULL,
   `ActiveORAddressesTable` varchar(256) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -294,7 +298,7 @@ CREATE TABLE `ORAddresses1` (
   `descriptor_id` int(11) NOT NULL,
   `address` varchar(100) NOT NULL,
   `port` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -307,7 +311,7 @@ CREATE TABLE `ORAddresses2` (
   `descriptor_id` int(11) NOT NULL,
   `address` varchar(100) NOT NULL,
   `port` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Indizes der exportierten Tabellen
@@ -426,7 +430,7 @@ ALTER TABLE `ORAddresses1`
 --
 -- Indizes für die Tabelle `ORAddresses2`
 --
-ALTER TABLE `ORAddresses1`
+ALTER TABLE `ORAddresses2`
   ADD PRIMARY KEY (`id`),
   ADD KEY `address` (`address`),
   ADD KEY `descriptor_id` (`descriptor_id`);
@@ -521,3 +525,6 @@ INSERT INTO `NetworkStatusSource` (`ID`,`Fingerprint`,`Name`,`LastDescriptorPubl
 INSERT INTO `Status` (`ID`,`LastUpdate`,`LastUpdateElapsed`,`ActiveNetworkStatusTable`,`ActiveDescriptorTable`) VALUES (1,'2000-01-01 00:00:00',NULL,NULL,NULL);
 
 INSERT INTO `Mirrors` (`id`,`mirrors`) VALUES (1,'');
+
+COMMIT;
+

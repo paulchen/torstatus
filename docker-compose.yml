@@ -1,0 +1,37 @@
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - 127.0.0.1:8765:80
+    volumes:
+      - ./web:/var/www/html
+      - ./lib:/var/www/lib
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+  php-fpm:
+    build: php-fpm
+    volumes:
+      - ./web:/var/www/html
+  mariadb:
+    image: mariadb:11.5
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: torstatus
+    volumes:
+      - torstatus-mariadb:/var/lib/mysql
+      - ./mariadb/sql:/docker-entrypoint-initdb.d/
+  updater:
+    build: updater
+    volumes:
+      - ./:/opt/torstatus
+      - geoip:/usr/share/tor
+  tor:
+    build: tor
+    volumes:
+      - geoip:/usr/share/tor
+  memcached:
+    image: memcached:1.6-bookworm
+
+volumes:
+  torstatus-mariadb:
+  geoip:
+
