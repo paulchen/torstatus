@@ -62,7 +62,7 @@ my %CACHE;
 # First the configuration file must be read
 # All of the variables will be inputed into a hash for ease of use
 my %config;
-open (my $config_handle, "<", "../web/config.php");
+open (my $config_handle, "<", "./config.php");
 while (<$config_handle>)
 {
 	# A regular expression is going to try to pull out the configuration
@@ -902,8 +902,8 @@ close($torLogfile);
 
 # Sleep for the desired time from the configuration file
 # print "6\n";
-my @file_list = ('/var/www/TorNetworkStatus/last_update');
-#TODO touch(@file_list);
+my @file_list = ('./last_update');
+touch(@file_list);
 exit 0;
 
 ############ Subroutines #####################################################

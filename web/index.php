@@ -53,7 +53,7 @@ if ($UsingSquid == 1)
 else
 {
 	$ServerIP = $_SERVER['SERVER_ADDR'];
-	$RemoteIP = $_SERVER['REMOTE_ADDR'];
+	$RemoteIP = ($forwardedFor != '') ? $forwardedFor : $_SERVER['REMOTE_ADDR'];
 }
 $ServerPort = $_SERVER['SERVER_PORT'];
 $RemoteIPDBCount = null;
@@ -2682,7 +2682,7 @@ echo "<option value='Contains'"; if ($CSMod == 'Contains'){echo " selected='sele
 echo "<option value='LessThan'"; if ($CSMod == 'LessThan'){echo " selected='selected'";} echo ">Is Less Than</option>\n";
 echo "<option value='GreaterThan'"; if ($CSMod == 'GreaterThan'){echo " selected='selected'";} echo ">Is Greater Than</option>\n";
 echo "</select><br/>\n";
-echo "<input type='text' name='CSInput' class='BOX' maxlength='128' size='45' value='" . htmlspecialchars($CSInput, ENT_QUOTES) . "' /><br/><br/>\n";
+echo "<input type='text' name='CSInput' class='BOX' maxlength='128' size='45' value='" . htmlspecialchars($CSInput ? $CSInput : '', ENT_QUOTES) . "' /><br/><br/>\n";
 echo "&nbsp;&nbsp;<input type='submit' value='Apply Options' /><br/><br/>\n";
 echo "</td>\n";
 echo "</tr>\n";

@@ -95,16 +95,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 }
 
 // Variable scrubbing
-if (strlen($QueryIP) > 15)
-{
-	$QueryIP = null;
-}
-else
-{
-	$QueryIP = $mysqli->escape_string($QueryIP);
-}
 if ($QueryIP != null)
 {
+	if (strlen($QueryIP) > 15)
+	{
+		$QueryIP = null;
+	}
+	else
+	{
+		$QueryIP = $mysqli->escape_string($QueryIP);
+	}
+
 	$QueryIP_Long = ip2long($QueryIP);
 	if ($QueryIP_Long == -1 || $QueryIP_Long === FALSE)
 	{
@@ -116,16 +117,17 @@ if ($QueryIP != null)
 	}
 }
 
-if (strlen($DestinationIP) > 15)
-{
-	$DestinationIP = null;
-}
-else
-{
-	$DestinationIP = $mysqli->escape_string($DestinationIP);
-}
 if ($DestinationIP != null)
 {
+	if (strlen($DestinationIP) > 15)
+	{
+		$DestinationIP = null;
+	}
+	else
+	{
+		$DestinationIP = $mysqli->escape_string($DestinationIP);
+	}
+
 	$DestinationIP_Long = ip2long($DestinationIP);
 	if ($DestinationIP_Long == -1 || $DestinationIP_Long === FALSE)
 	{
@@ -137,16 +139,17 @@ if ($DestinationIP != null)
 	}
 }
 
-if (strlen($DestinationPort) > 5)
-{
-	$DestinationPort = null;
-}
-else
-{
-	$DestinationPort = $mysqli->escape_string($DestinationPort);
-}
 if ($DestinationPort != null)
 {
+	if (strlen($DestinationPort) > 5)
+	{
+		$DestinationPort = null;
+	}
+	else
+	{
+		$DestinationPort = $mysqli->escape_string($DestinationPort);
+	}
+
 	if 	(
 		!is_numeric($DestinationPort) 	|| 
 		intval($DestinationPort) < 0	|| 
@@ -380,11 +383,11 @@ Policy would permit it to exit to a certain destination IP address and port.</b>
 <?php
 	echo "<form action='$Self' method='post'>\n";
 	echo "<b>IP Address to Query:<br/><span class='TRSM'>(Required)</span></b><br/>\n";
-	echo "<input type='text' name='QueryIP' class='BOX' maxlength='15' size='20' value='" . htmlspecialchars($QueryIP, ENT_QUOTES) . "' /><br/><br/><br/>\n"; 
+	echo "<input type='text' name='QueryIP' class='BOX' maxlength='15' size='20' value='" . htmlspecialchars($QueryIP ? $QueryIP : '', ENT_QUOTES) . "' /><br/><br/><br/>\n"; 
 	echo "<b>Destination IP Address:<br/><span class='TRSM'>(Optional)</span></b><br/>\n";
-	echo "<input type='text' name='DestinationIP' class='BOX' maxlength='15' size='20' value='" . htmlspecialchars($DestinationIP, ENT_QUOTES) . "' /><br/><br/>\n";
+	echo "<input type='text' name='DestinationIP' class='BOX' maxlength='15' size='20' value='" . htmlspecialchars($DestinationIP ? $DestinationIP : '', ENT_QUOTES) . "' /><br/><br/>\n";
 	echo "<b>Destination Port:<br/><span class='TRSM'>(Optional)</span></b><br/>\n";
-	echo "<input type='text' name='DestinationPort' class='BOX' maxlength='5' size='6' value='" . htmlspecialchars($DestinationPort, ENT_QUOTES) . "' /><br/><br/><br/>\n";
+	echo "<input type='text' name='DestinationPort' class='BOX' maxlength='5' size='6' value='" . htmlspecialchars($DestinationPort ? $DestinationPort : '', ENT_QUOTES) . "' /><br/><br/><br/>\n";
 	echo "<input type='submit' value='Submit Query' /><br/><br/>\n";
 	echo "</form>\n";
 ?>

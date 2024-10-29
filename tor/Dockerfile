@@ -1,8 +1,11 @@
 FROM debian:bookworm-slim
 
 RUN apt-get update
-
-RUN apt-get -y install apt-transport-https wget gpg
+RUN apt-get -y dist-upgrade
+RUN apt-get -y install monitoring-plugins-basic apt-transport-https wget gpg
+RUN apt-get -y autoremove
+RUN apt-get -y purge $(dpkg -l | grep '^rc' | awk '{print $2}')
+RUN apt-get clean
 
 COPY tor.list /etc/apt/sources.list.d/tor.list
 

@@ -7,10 +7,22 @@ services:
       - ./web:/var/www/html
       - ./lib:/var/www/lib
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - torstatus
+    healthcheck:
+      test: curl http://localhost/column_set.php || exit 1
+      interval: 5m
+      timeout: 10s
   php-fpm:
     build: php-fpm
     volumes:
       - ./web:/var/www/html
+    networks:
+      - torstatus
+    healthcheck:
+      test: "/usr/lib/nagios/plugins/check_tcp -H localhost -p 9000 || exit 1"
+      interval: 5m
+      timeout: 10s
   mariadb:
     image: mariadb:11.5
     restart: always
@@ -19,19 +31,46 @@ services:
     volumes:
       - torstatus-mariadb:/var/lib/mysql
       - ./mariadb/sql:/docker-entrypoint-initdb.d/
+    networks:
+      - torstatus
+    healthcheck:
+      test: "healthcheck.sh --connect --innodb_initialized || exit 1"
+      interval: 5m
+      timeout: 10s
   updater:
     build: updater
     volumes:
-      - ./:/opt/torstatus
+      - /var/www/tns/web/config.php:/opt/torstatus/config.php
       - geoip:/usr/share/tor
+    networks:
+      - torstatus
+    healthcheck:
+      test: "/usr/lib/nagios/plugins/check_file_age -w 1800 -c 3600 /opt/torstatus/last_update || exit 1"
+      interval: 5m
+      timeout: 10s
   tor:
     build: tor
     volumes:
       - geoip:/usr/share/tor
+    networks:
+      - torstatus
+    healthcheck:
+      test: "/usr/lib/nagios/plugins/check_tcp -H localhost -p 9051 || exit 1"
+      interval: 5m
+      timeout: 10s
   memcached:
     image: memcached:1.6-bookworm
+    networks:
+      - torstatus
+    healthcheck:
+      test: 'echo version | bash -c "(exec 3<>/dev/tcp/localhost/11211; cat >&3; timeout 0.1 cat <&3; exec 3<&-)"'
+      interval: 5m
+      timeout: 10s
 
 volumes:
   torstatus-mariadb:
   geoip:
 
+networks:
+  torstatus:
+    external: True

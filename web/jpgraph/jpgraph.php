@@ -328,15 +328,15 @@ class DateLocale {
 	}
  
 	$this->iLocale = $aLocale;
-	for ( $i = 0, $ofs = 0 - strftime('%w'); $i < 7; $i++, $ofs++ ){
-	    $day = strftime('%a', strtotime("$ofs day"));
+	for ( $i = 0, $ofs = 0 - date('w'); $i < 7; $i++, $ofs++ ){
+	    $day = date('D', strtotime("$ofs day"));
 	    $day[0] = strtoupper($day[0]);
 	    $this->iDayAbb[$aLocale][]= $day[0];
 	    $this->iShortDay[$aLocale][]= $day;
 	}
 
 	for($i=1; $i<=12; ++$i) {
-	    list($short ,$full) = explode('|', strftime("%b|%B",strtotime("2001-$i-01")));
+	    list($short ,$full) = explode('|', date("%M|%F",strtotime("2001-$i-01")));
 	    $this->iShortMonth[$aLocale][] = ucfirst($short);
 	    $this->iMonthName [$aLocale][] = ucfirst($full);
 	}
@@ -441,6 +441,7 @@ class Graph {
     public $title,$subtitle,$subsubtitle; 	// Title and subtitle(s) text object
     public $axtype="linlin";	// Type of axis
     public $xtick_factor;	// Factot to determine the maximum number of ticks depending on the plot with
+    public $ytick_factor;
     public $texts=null, $y2texts=null;		// Text object to ge shown in the graph
     public $lines=null, $y2lines=null;
     public $bands=null, $y2bands=null;
@@ -453,6 +454,7 @@ class Graph {
     public $grid_depth=DEPTH_BACK;	// Draw grid under all plots as default
     public $iAxisStyle = AXSTYLE_SIMPLE;
     public $iCSIMdisplay=false,$iHasStroked = false;
+    public $legend;
     public $footer;
     public $csimcachename = '', $csimcachetimeout = 0, $iCSIMImgAlt='';
     public $iDoClipping = false;
@@ -4047,7 +4049,7 @@ class LinearTicks extends Ticks {
     public $minor_step=1, $major_step=2;
     public $xlabel_offset=0,$xtick_offset=0;
     public $maj_ticks_pos = array(), $maj_ticklabels_pos = array(), 
-	$ticks_pos = array(), $maj_ticks_label = array();
+	$ticks_pos = array(), $maj_ticks_label = array(), $ticks_label = array();
     private $label_offset=0; // What offset should the displayed label have
     // i.e should we display 0,1,2 or 1,2,3,4 or 2,3,4 etc
     private $text_label_start=0;
@@ -5906,7 +5908,7 @@ class Image {
     }
 	
 
-    function _StrokeBuiltinFont($x,$y,$txt,$dir=0,$paragraph_align="left",&$aBoundingBox,$aDebug=false) {
+    function _StrokeBuiltinFont($x,$y,$txt,$dir,$paragraph_align,&$aBoundingBox,$aDebug=false) {
 
 	if( is_numeric($dir) && $dir!=90 && $dir!=0) 
 	    JpGraphError::RaiseL(25091);//(" Internal font does not support drawing text at arbitrary angle. Use TTF fonts instead.");
@@ -5928,7 +5930,7 @@ class Image {
 	    $y += $dir==0 ? $h/2 : $w/2;
 	
 	if( $dir==90 ) {
-	    imagestringup($this->img,$this->font_family,$x,$y,$txt,$this->current_color);
+	    imagestringup($this->img,$this->font_family,intval($x),intval($y),$txt,$this->current_color);
 	    $aBoundingBox = array(round($x),round($y),round($x),round($y-$w),round($x+$h),round($y-$w),round($x+$h),round($y));
             if( $aDebug ) {
 		// Draw bounding box
@@ -5957,7 +5959,7 @@ class Image {
 	    } 
 	    else {
 		//Put the text
-		imagestring($this->img,$this->font_family,$x,$y-$h+1,$txt,$this->current_color);
+		imagestring($this->img,$this->font_family,intval($x),intval($y-$h+1),$txt,$this->current_color);
 	    }
             if( $aDebug ) {
 		// Draw the bounding rectangle and the bounding box
@@ -6058,7 +6060,7 @@ class Image {
 	return $box[2]-$box[0]+1;	
     }
 
-    function _StrokeTTF($x,$y,$txt,$dir=0,$paragraph_align="left",&$aBoundingBox,$debug=false) {
+    function _StrokeTTF($x,$y,$txt,$dir,$paragraph_align,&$aBoundingBox,$debug=false) {
 
 	// Setupo default inter line margin for paragraphs to
 	// 25% of the font height.
@@ -6465,7 +6467,7 @@ class Image {
 	}
 	for($i=0; $i < $n; ++$i) 
 	    $pts[$i] = round($pts[$i]);
-	imagefilledpolygon($this->img,$pts,count($pts)/2,$this->current_color);
+	imagefilledpolygon($this->img,$pts,$this->current_color);
     }
 	
     function Rectangle($xl,$yu,$xr,$yl) {
