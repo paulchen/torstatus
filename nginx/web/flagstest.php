@@ -6,10 +6,7 @@
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 	<title>TorStatus - Tor Network Status</title>
 	<link rel="stylesheet" type="text/css" href="css/main.css" />
-	<link rel="stylesheet" type="text/css" href="css/flags.css" />
-	<!--[if lt IE 7.]>
-	<script defer type="text/javascript" src="/js/pngfix.js"></script>
-	<![endif]-->
+	<link rel="stylesheet" type="text/css" href="css/sprites.css" />
 </head>
 
 <body>
@@ -25,7 +22,7 @@ while(($filename = readdir($directory)) !== false) {
 closedir($directory);
 sort($filenames);
 foreach($filenames as $filename): ?>
-	<div class="flag_<?php echo $filename ?>"></div>&nbsp;<?php echo $filename; ?><br />
+	<div class="flags_<?php echo $filename ?>"></div>&nbsp;<?php echo $filename; ?><br />
 <?php endforeach; ?>
 </div>
 </body>

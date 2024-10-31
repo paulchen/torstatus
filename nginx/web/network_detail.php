@@ -514,11 +514,7 @@ include("header.php");
 </tr>
 <tr>
 <td class='TRSBcenter' colspan='2' align='center'>
-<?php if ($usePerlGraphs == 1) { ?>
-<img src="/cgi-bin/perlgraph/plot.pl?plottype=cc" alt="Number of Routers by Country Code" />
-<?php } else { ?>
 <img src="/cc_graph.php" alt="Number of Routers by Country Code" />
-<?php } ?>
 </td>
 </tr>
 <tr>
@@ -526,11 +522,7 @@ include("header.php");
 </tr>
 <tr>
 <td class='TRSBcenter' colspan='2' align='center'>
-<?php if ($usePerlGraphs == 1) { ?>
-<img src="/cgi-bin/perlgraph/plot.pl?plottype=cce" alt="Number of Exit Routers by Country Code" />
-<?php } else { ?>
 <img src="/cc_exit_graph.php" alt="Number of Exit Routers by Country Code" />
-<?php } ?>
 </td>
 </tr>
 <tr>
@@ -538,11 +530,7 @@ include("header.php");
 </tr>
 <tr>
 <td class='TRSBcenter' colspan='2' align='center'>
-<?php if ($usePerlGraphs == 1) { ?>
-<img src="/cgi-bin/perlgraph/plot.pl?plottype=up" alt="Number of Routers by Uptime" />
-<?php } else { ?>
 <img src="/uptime_graph.php" alt="Number of Routeres by Uptime" />
-<?php } ?>
 </td>
 </tr>
 <tr>
@@ -551,18 +539,10 @@ include("header.php");
 </tr>
 <tr>
 <td class='TRSBcenter' colspan='1' align='center'>
-<?php if ($usePerlGraphs == 1) { ?>
-<img src="/cgi-bin/perlgraph/plot.pl?plottype=bw" alt="Number of Routers by Bandwidth" />
-<?php } else { ?>
 <img src="/bandwidth_graph.php" alt="Number of Routers by Bandwidth" />
-<?php } ?>
 </td>
 <td class='TRSBcenter' colspan='1' align='center' style='padding: 10px; border-left-color: #59990e; border-left-style: solid; border-left-width: 1px;'>
-<?php if ($usePerlGraphs == 1) { ?>
-<img src="/cgi-bin/perlgraph/plot.pl?plottype=os" alt="Number of Routers by Platform" />
-<?php } else { ?>
 <img src="/platform_graph.php" alt="Number of Routers by Platform" />
-<?php } ?>
 </td>
 </tr>
 <tr>
@@ -571,11 +551,7 @@ include("header.php");
 
 <tr>
 <td class='TRSBcenter' colspan='2' align='center'>
-<?php if ($usePerlGraphs == 1) { ?>
-<img src="/cgi-bin/perlgraph/plot.pl?plottype=sum" alt="Summary Graph" />
-<?php } else { ?>
 <img src="/summary_graph.php" alt="Summary Graph" />
-<?php } ?>
 
 
 </td>

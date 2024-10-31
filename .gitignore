@@ -1,4 +1,2 @@
-web/config.php
-web/atlas
-last_update
-tns_requests.log
+nginx/web/config.php
+updater/last_update

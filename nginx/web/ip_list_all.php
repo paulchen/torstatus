@@ -5,9 +5,9 @@
 
 require_once('common.php');
 
-if(!($output = $memcached->get("torstatus_ip_list_exit_csv"))) {
+if(!($output = $memcached->get("torstatus_ip_list_all_csv"))) {
 	// Get data from database
-	$query = "select IP, INET_ATON(IP) as NIP from $ActiveNetworkStatusTable where FExit = '1' order by NIP Asc";
+	$query = "select IP, INET_ATON(IP) as NIP from $ActiveNetworkStatusTable order by NIP Asc";
 	$result = $mysqli->query($query);
 	if(!$result) {
 		die_503('Query failed: ' . $mysqli->error);
@@ -16,13 +16,13 @@ if(!($output = $memcached->get("torstatus_ip_list_exit_csv"))) {
 	$output = '';
 	while ($record = $result->fetch_assoc()) 
 	{
-		$output .= "${record['IP']}\n";
+		$output .= "{$record['IP']}\n";
 	}
 
 	// Close connection
 	$result->free();
 
-	$memcached->set("torstatus_ip_list_exit_csv", $output, 1800);
+	$memcached->set("torstatus_ip_list_all_csv", $output, 1800);
 }
 $mysqli->close();
 

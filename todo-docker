@@ -3,6 +3,5 @@ hidden services
 document everything in README.md
 Tor: keys (/var/lib/tor)
 
-logging (log files, log reporting, syslog)
-
+Nagios/Icinga checks
 

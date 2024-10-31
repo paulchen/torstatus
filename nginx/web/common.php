@@ -52,16 +52,14 @@ function fetch_mirrors() {
 }
 
 function connection_information() {
-	global $TorNetworkStatus_Version, $onion_service, $UsingSSL, $AllowSSL, $Self, $SSLLink;
+	global $TorNetworkStatus_Version, $onion_service, $Self;
 ?>
 <span class="logotext">
-	<?php echo $TorNetworkStatus_Version; ?>
+	4.0
 	<?php if($onion_service): ?>
 		- Connection via onion service
-	<?php elseif ($UsingSSL == 1): ?>
+	<?php else: ?>
 		- Encrypted connection
-	<?php elseif ($AllowSSL): ?>
-		- <a href="<?php echo $SSLLink; echo substr($Self,-(strlen($Self)-1)); echo "?"; echo $_SERVER['QUERY_STRING'];  ?>" class="plain">Use an encrypted connection <b>(recommended)</b></a>
 	<?php endif; ?>
 </span>
 <?php

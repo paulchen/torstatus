@@ -4,21 +4,6 @@
 
 $Self = $_SERVER['PHP_SELF'];
 
-// Determine whether or not SSL is being used
-if ($DetermineUsingSSL == 1)
-{
-	if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'])
-	{
-		$UsingSSL = 1;
-		// Set the squid value to the SSL version of the Squid value
-		$UsingSquid = $SSLUsingSquid;
-	}
-	else
-	{
-		$UsingSSL = 0;
-	}
-}
-
 fetch_mirrors();
 
 if(!$onion_service) {
@@ -36,9 +21,6 @@ if(!$onion_service) {
 <?php endif; ?>
 	<title>TorStatus - <?php echo $pageTitle; ?></title>
 	<link rel="stylesheet" type="text/css" href="css/main.css" />
-	<!--[if lt IE 7.]>
-	<script defer type="text/javascript" src="/js/pngfix.js"></script>
-	<![endif]-->
 </head>
 
 <body>

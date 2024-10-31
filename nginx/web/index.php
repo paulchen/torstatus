@@ -26,35 +26,12 @@ $DescriptorCount = 0;
 $CurrentResultSet = 0;
 $RowCounter = 0;
 
-// Determine whether or not SSL is being used
-if ($DetermineUsingSSL == 1)
-{
-	if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'])
-	{
-		$UsingSSL = 1;
-		// Set the squid value to the SSL version of the Squid value
-		$UsingSquid = $SSLUsingSquid;
-	}
-	else
-	{
-		$UsingSSL = 0;
-	}
-}
-
 $Self = $_SERVER['PHP_SELF'];
 $forwardedFor = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
 $xff = array_map( 'trim', explode( ',',$forwardedFor ) );
 $xff = array_reverse( $xff );
-if ($UsingSquid == 1)
-{
-	$ServerIP = $RealServerIP;
-	$RemoteIP = $xff[0];
-}
-else
-{
-	$ServerIP = $_SERVER['SERVER_ADDR'];
-	$RemoteIP = ($forwardedFor != '') ? $forwardedFor : $_SERVER['REMOTE_ADDR'];
-}
+$ServerIP = ($forwardedFor != '') ? $RealServerIP : $_SERVER['SERVER_ADDR'];
+$RemoteIP = ($forwardedFor != '') ? $xff[0] : $_SERVER['REMOTE_ADDR'];
 $ServerPort = $_SERVER['SERVER_PORT'];
 $RemoteIPDBCount = null;
 $PositiveMatch_IP = 0;
@@ -2088,9 +2065,6 @@ if(!$onion_service) {
 	<title>TorStatus - Tor Network Status</title>
 	<link rel="stylesheet" type="text/css" href="css/main.css" />
 	<link rel="stylesheet" type="text/css" href="css/sprites.css" />
-	<!--[if lt IE 7.]>
-	<script defer type="text/javascript" src="/js/pngfix.js"></script>
-	<![endif]-->
 </head>
 
 <body>
@@ -2775,11 +2749,6 @@ echo "</tr>\n";
 echo "<tr>\n";
 echo "<td class='TRAR'><b>Last Update Cycle Processing Time (Seconds):</b></td>\n";
 echo "<td class='TRS'>$LastUpdateElapsed</td>\n";
-echo "</tr>\n";
-
-echo "<tr>\n";
-echo "<td class='TRAR'><b>Current Cache Expire Time (Seconds):</b></td>\n";
-echo "<td class='TRS'>$Cache_Expire_Time</td>\n";
 echo "</tr>\n";
 
 echo "<tr>\n";

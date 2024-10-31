@@ -328,18 +328,10 @@ include("header.php");
 <tr>
 <?php if(0): ?>
 <td class='TRS' style="text-align: center;">
-<?php if ($usePerlGraphs == 1) { ?>
-<img src="/cgi-bin/perlgraph/plot.pl?plottype=rtw" alt="Write History" /><br/>
-<?php } else { ?>
 <img src='bandwidth_history_graph.php?MODE=WriteHistory' />
-<?php } ?>
 </td>
 <td class='TRSB' style="text-align: center;">
-<?php if ($usePerlGraphs == 1) { ?>
-<img src="/cgi-bin/perlgraph/plot.pl?plottype=rtr" alt="Read History" /><br/>
-<?php } else { ?>
 <img src='bandwidth_history_graph.php?MODE=ReadHistory' />
-<?php } ?>
 </td>
 <?php else: ?>
 <td class='TRS' style="text-align: center;"></td>
