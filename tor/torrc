@@ -7,3 +7,5 @@ FetchDirInfoExtraEarly 1
 FetchUselessDescriptors 1
 HiddenServiceStatistics 1
 
+%include /etc/tor/torrc.d
+

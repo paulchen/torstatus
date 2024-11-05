@@ -1,2 +1,7 @@
 nginx/web/config.php
 updater/last_update
+tor/torrc.d/*
+!tor/torrc.d/.gitkeep
+tor/hidden_services/*
+!tor/hidden_services/.gitkeep
+

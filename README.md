@@ -4,8 +4,6 @@ Web application listing Tor nodes running at [https://torstatus.rueckgr.at/](htt
 
 ## Docker-based setup (recommended)
 
-TODO set-up of keys and hidden services
-
 ### Prerequisites
  - Git
  - Docker together with Docker compose
@@ -54,6 +52,11 @@ The `php-fpm` container exposes port `9001`. You can have your reverse proxy han
   SetHandler "proxy:fcgi://127.0.0.1:9001"
 </FilesMatch>
 ```
+
+### Hidden services
+
+ - The directory `tor/hidden_services` will be mounted at `/var/lib/tor/hidden_services` inside the container. Place the files for your hidden services there.
+ - Add a file to the `tor/torrc.d` directory configuring your hidden services using the `HiddenService*` directives. Use `/var/lib/tor/hidden_services/...` for `HiddenServiceDir` and keep the above mount in mind.
 
 ## Setup without docker
 

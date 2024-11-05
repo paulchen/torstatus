@@ -74,6 +74,8 @@ services:
     build: tor
     volumes:
       - geoip:/usr/share/tor
+      - ./tor/torrc.d:/etc/tor/torrc.d/
+      - ./tor/hidden_services:/var/lib/tor/hidden_services/
     networks:
       - torstatus
     logging:
