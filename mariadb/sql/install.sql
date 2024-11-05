@@ -22,10 +22,6 @@ SET time_zone = "+00:00";
 -- Datenbank: `torstatus`
 --
 
-CREATE DATABASE `torstatus`;
-USE `torstatus`;
-GRANT ALL PRIVILEGES ON torstatus.* TO torstatus@'%' IDENTIFIED BY 'torstatus';
-
 -- --------------------------------------------------------
 
 --

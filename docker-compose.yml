@@ -38,7 +38,7 @@ services:
       interval: 5m
       timeout: 10s
   mariadb:
-    image: mariadb:11.5
+    build: mariadb
     restart: always
     environment:
       MARIADB_ROOT_PASSWORD: torstatus
@@ -52,7 +52,7 @@ services:
       options:
         tag: "{{.Name}}"
     healthcheck:
-      test: "healthcheck.sh --connect --innodb_initialized || exit 1"
+      test: "/opt/healthcheck.sh || exit 1"
       interval: 5m
       timeout: 10s
   updater:
