@@ -84,6 +84,8 @@ $OffsetFromGMT = 0;
 
 $Hidden_Service_URL = isset($_ENV['HIDDEN_SERVICE_URL']) ? $_ENV['HIDDEN_SERVICE_URL'] : null;
 
+$memcached_host = 'memcached';
+
 // See if WHOIS wants the footer
 if (isset($argv) && isset($argv[1]) && $argv[1] == 'printthefooter')
 {

@@ -61,8 +61,13 @@ my %CACHE;
 
 # First the configuration file must be read
 # All of the variables will be inputed into a hash for ease of use
+my $config_file = './config.php';
+if ( ! -e $config_file ) {
+	$config_file = '../nginx/web/config.php';
+}
+
 my %config;
-open (my $config_handle, "<", "./config.php");
+open (my $config_handle, "<", $config_file);
 while (<$config_handle>)
 {
 	# A regular expression is going to try to pull out the configuration
@@ -90,7 +95,7 @@ close ($config_handle);
 my $start_time = time();
 
 my $memcached = new Cache::Memcached {
-	'servers' => [ 'memcached:11211' ],
+	'servers' => [ $config{'memcached_host'} . ':11211' ],
 	'debug' => 0,
 	'compress_threshold' => 10_000
 };
