@@ -1,6 +1,5 @@
 hidden services
 
-document everything in README.md
 Tor: keys (/var/lib/tor)
 
 Nagios/Icinga checks
