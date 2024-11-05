@@ -58,6 +58,11 @@ The `php-fpm` container exposes port `9001`. You can have your reverse proxy han
  - The directory `tor/hidden_services` will be mounted at `/var/lib/tor/hidden_services` inside the container. Place the files for your hidden services there.
  - Add a file to the `tor/torrc.d` directory configuring your hidden services using the `HiddenService*` directives. Use `/var/lib/tor/hidden_services/...` for `HiddenServiceDir` and keep the above mount in mind.
 
+### Logging
+
+ - All containers' logs are sent to journald.
+
+
 ## Setup without docker
 
 ### Tor
