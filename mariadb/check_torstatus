@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# for nagios-nrpe-server:
+# command[check_torstatus_flags]=/opt/icinga/check_torstatus flags <db-password>
+# command[check_torstatus_countries]=/opt/icinga/check_torstatus countries <db-password>
+
+NAME=$1
+PASSWORD=$2
+
+if [ "$NAME" == "countries" ]; then
+	NAME_SINGULAR="country/countries"
+elif [ "$NAME" == "flags" ]; then
+	NAME_SINGULAR="flag(s)"
+else
+	echo "Invalid plugin name. Dying now."
+	exit 3
+fi
+
+MISSING=`echo "SELECT COUNT(*) FROM missing_$NAME" | mariadb -u torstatus -p$PASSWORD torstatus|tail -n 1`
+if [ "$MISSING" -eq "0" ]; then
+	echo "Everything fine, no $NAME missing."
+	exit 0
+fi
+
+echo "$MISSING $NAME_SINGULAR missing."
+if [ "$MISSING" -gt 3 ]; then
+	exit 2
+elif [ "$MISSING" -gt 0 ]; then
+	exit 1
+fi
+

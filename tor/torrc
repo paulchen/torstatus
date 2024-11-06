@@ -1,0 +1,11 @@
+ControlPort 0.0.0.0:9051
+HashedControlPassword 16:FFD314C4FF6241CE6064E22AE367877F0CA53419FC2C319A2CFC8AB5B9
+UseMicrodescriptors 0
+DownloadExtraInfo 1
+FetchDirInfoEarly 1
+FetchDirInfoExtraEarly 1
+FetchUselessDescriptors 1
+HiddenServiceStatistics 1
+
+%include /etc/tor/torrc.d
+

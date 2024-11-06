@@ -1,0 +1,108 @@
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - 127.0.0.1:8765:80
+    volumes:
+      - ./nginx/web:/var/www/html
+      - ./nginx/web/config_docker.php:/var/www/html/config.php
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - torstatus
+    logging:
+      driver: "journald"
+      options:
+        tag: "{{.Name}}"
+    healthcheck:
+      test: curl http://localhost/column_set.php || exit 1
+      interval: 5m
+      timeout: 10s
+  php-fpm:
+    build: php-fpm
+    ports:
+      - 127.0.0.1:9001:9000
+    environment:
+      - REAL_SERVER_IP=${REAL_SERVER_IP}
+      - HIDDEN_SERVICE_URL=${HIDDEN_SERVICE_URL}
+    volumes:
+      - ./nginx/web:/var/www/html
+      - ./nginx/web/config_docker.php:/var/www/html/config.php
+    networks:
+      - torstatus
+    logging:
+      driver: "journald"
+      options:
+        tag: "{{.Name}}"
+    healthcheck:
+      test: "/usr/lib/nagios/plugins/check_tcp -H localhost -p 9000 || exit 1"
+      interval: 5m
+      timeout: 10s
+  mariadb:
+    build: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: torstatus
+    volumes:
+      - torstatus-mariadb:/var/lib/mysql
+      - ./mariadb/sql:/docker-entrypoint-initdb.d/
+    networks:
+      - torstatus
+    logging:
+      driver: "journald"
+      options:
+        tag: "{{.Name}}"
+    healthcheck:
+      test: "/opt/healthcheck.sh || exit 1"
+      interval: 5m
+      timeout: 10s
+  updater:
+    build: updater
+    volumes:
+      - ./nginx/web/config_docker.php:/opt/torstatus/config.php
+      - geoip:/usr/share/tor
+    networks:
+      - torstatus
+    logging:
+      driver: "journald"
+      options:
+        tag: "{{.Name}}"
+    healthcheck:
+      test: "/usr/lib/nagios/plugins/check_file_age -w 1800 -c 3600 /opt/torstatus/last_update || exit 1"
+      interval: 5m
+      timeout: 10s
+  tor:
+    build: tor
+    volumes:
+      - geoip:/usr/share/tor
+      - ./tor/torrc.d:/etc/tor/torrc.d/
+      - ./tor/hidden_services:/var/lib/tor/hidden_services/
+    networks:
+      - torstatus
+    logging:
+      driver: "journald"
+      options:
+        tag: "{{.Name}}"
+    healthcheck:
+      test: "/usr/lib/nagios/plugins/check_tcp -H localhost -p 9051 || exit 1"
+      interval: 5m
+      timeout: 10s
+  memcached:
+    image: memcached:1.6-bookworm
+    networks:
+      - torstatus
+    logging:
+      driver: "journald"
+      options:
+        tag: "{{.Name}}"
+    healthcheck:
+      test: 'echo version | bash -c "(exec 3<>/dev/tcp/localhost/11211; cat >&3; timeout 0.1 cat <&3; exec 3<&-)"'
+      interval: 5m
+      timeout: 10s
+
+volumes:
+  torstatus-mariadb:
+  geoip:
+
+networks:
+  torstatus:
+    external: True
