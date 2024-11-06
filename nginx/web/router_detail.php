@@ -54,8 +54,8 @@ $query = "select $ActiveNetworkStatusTable.Name, $ActiveDescriptorTable.LastDesc
 $record = db_query_single_row($query);
 
 if(!$record) {
-	echo("Unknown fingerprint");
 	http_response_code(404);
+	echo("Unknown fingerprint");
 	die();
 }
 #echo "<!-- \n";
