@@ -15,6 +15,7 @@ RUN apt-get update && apt-get -y install tor-geoipdb tor deb.torproject.org-keyr
 RUN mkdir /run/tor && chown debian-tor:debian-tor /run/tor && chmod 0700 /run/tor
 
 COPY torrc /etc/tor/torrc
+COPY updates.sh /opt
 
 CMD [ "/usr/bin/tor", "--defaults-torrc", "/usr/share/tor/tor-service-defaults-torrc", "-f", "/etc/tor/torrc", "--RunAsDaemon", "0" ] 
 
