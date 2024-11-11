@@ -39,7 +39,6 @@ services:
       timeout: 10s
   mariadb:
     build: mariadb
-    restart: always
     environment:
       MARIADB_ROOT_PASSWORD: torstatus
     volumes:
