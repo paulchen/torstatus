@@ -787,7 +787,7 @@ function DisplayRouterRow()
 				$value == "Contact"
 			):
 
-			echo "<td class='TDS'>" . htmlentities($record[$value], ENT_QUOTES) . "</td>";
+			echo "<td class='TDS'>" . htmlentities($record[$value] ? $record[$value] : '', ENT_QUOTES) . "</td>";
 			break;
 
   			case

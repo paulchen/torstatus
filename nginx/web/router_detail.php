@@ -41,6 +41,11 @@ if (isset($_GET["FP"]))
 {
 	$Fingerprint = $_GET["FP"];
 }
+else {
+	http_response_code(400);
+	echo('Parameter FP missing');
+	die();
+}
 
 // Perform variable scrubbing
 $Fingerprint = strip_tags($Fingerprint);
