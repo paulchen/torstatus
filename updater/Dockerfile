@@ -2,7 +2,7 @@ FROM perl:5
 
 RUN apt-get update
 RUN apt-get -y dist-upgrade
-RUN apt-get -y install monitoring-plugins-basic
+RUN apt-get -y install monitoring-plugins-basic psmisc
 RUN apt-get -y autoremove
 RUN apt-get -y purge $(dpkg -l | grep '^rc' | awk '{print $2}')
 RUN apt-get clean

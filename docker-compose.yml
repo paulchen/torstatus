@@ -1,6 +1,9 @@
 services:
   nginx:
     image: nginx:latest
+    depends_on:
+      php-fpm:
+        condition: service_healthy
     ports:
       - 127.0.0.1:8765:80
     volumes:
@@ -15,6 +18,8 @@ services:
         tag: "{{.Name}}"
     healthcheck:
       test: curl http://localhost/column_set.php || exit 1
+      start_period: 10s
+      start_interval: 10s
       interval: 5m
       timeout: 10s
   php-fpm:
@@ -35,10 +40,13 @@ services:
         tag: "{{.Name}}"
     healthcheck:
       test: "/usr/lib/nagios/plugins/check_tcp -H localhost -p 9000 || exit 1"
+      start_period: 10s
+      start_interval: 10s
       interval: 5m
       timeout: 10s
   mariadb:
     build: mariadb
+    stop_grace_period: 30s
     environment:
       MARIADB_ROOT_PASSWORD: torstatus
     volumes:
@@ -52,10 +60,15 @@ services:
         tag: "{{.Name}}"
     healthcheck:
       test: "/opt/healthcheck.sh || exit 1"
+      start_period: 10s
+      start_interval: 10s
       interval: 5m
       timeout: 10s
   updater:
     build: updater
+    depends_on:
+      tor:
+        condition: service_healthy
     volumes:
       - ./nginx/web/config_docker.php:/opt/torstatus/config.php
       - geoip:/usr/share/tor
@@ -67,10 +80,14 @@ services:
         tag: "{{.Name}}"
     healthcheck:
       test: "/usr/lib/nagios/plugins/check_file_age -w 1800 -c 3600 /opt/torstatus/last_update || exit 1"
+      start_period: 10m
       interval: 5m
       timeout: 10s
   tor:
     build: tor
+    depends_on:
+      nginx:
+        condition: service_healthy
     volumes:
       - geoip:/usr/share/tor
       - ./tor/torrc.d:/etc/tor/torrc.d/
@@ -83,6 +100,8 @@ services:
         tag: "{{.Name}}"
     healthcheck:
       test: "/usr/lib/nagios/plugins/check_tcp -H localhost -p 9051 || exit 1"
+      start_period: 10s
+      start_interval: 10s
       interval: 5m
       timeout: 10s
   memcached:
@@ -95,6 +114,8 @@ services:
         tag: "{{.Name}}"
     healthcheck:
       test: 'echo version | bash -c "(exec 3<>/dev/tcp/localhost/11211; cat >&3; timeout 0.1 cat <&3; exec 3<&-)"'
+      start_period: 10s
+      start_interval: 10s
       interval: 5m
       timeout: 10s
 
