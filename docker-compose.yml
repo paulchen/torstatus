@@ -105,7 +105,7 @@ services:
       interval: 5m
       timeout: 10s
   memcached:
-    image: memcached:1.6-bookworm
+    image: memcached:1.6-trixie
     networks:
       - torstatus
     logging:
