@@ -7,7 +7,7 @@ RUN apt-get -y autoremove
 RUN apt-get -y purge $(dpkg -l | grep '^rc' | awk '{print $2}')
 RUN apt-get clean
 
-RUN cpanm DBI PHP::Serialization LWP::Simple File::Touch Parallel::ForkManager Cache::Memcached Net::IP DBD::MariaDB
+RUN cpanm DBI PHP::Serialization HTTP::Message@7.0 LWP::Simple File::Touch Parallel::ForkManager Cache::Memcached Net::IP DBD::MariaDB
 RUN mkdir /opt/torstatus
 
 ADD tns_update.pl /opt/torstatus
